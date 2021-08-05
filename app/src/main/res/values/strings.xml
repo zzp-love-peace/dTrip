@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">dTrip</string>
+    <string name="title_trip">出行</string>
+    <string name="title_mine">我的</string>
+</resources>
