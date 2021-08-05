@@ -2,6 +2,29 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.zzp.dtrip">
 
+    <meta-data
+        android:name="com.huawei.hms.client.channel.androidMarket"
+        android:value="false" />
+
+    <queries>
+        <intent>
+            <action android:name="com.huawei.hms.core.aidlservice" />
+        </intent>
+    </queries>
+
+    <!--允许程序访问网络连接-->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!--允许程序获取网络信息状态-->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <!--自定义权限，允许程序读取公共数据-->
+    <uses-permission android:name="com.huawei.appmarket.service.commondata.permission.GET_COMMON_DATA"/>
+    <!--允许改变WLAN状态的开关-->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <!--允许程序通过Wi-Fi或移动基站的方式获取用户粗略的经纬度信息-->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <!--允许程序通过GPS芯片接收卫星的定位信息-->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"

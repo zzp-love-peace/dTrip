@@ -3,6 +3,7 @@ package com.zzp.dtrip.activity
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.huawei.hms.maps.MapsInitializer
 import com.zzp.dtrip.R
 import com.zzp.dtrip.fragment.MineFragment
 import com.zzp.dtrip.fragment.TripFragment
@@ -15,7 +16,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        // 设置API key
+        MapsInitializer.setApiKey("CgF6e3x9L8tbJ7yLqpxTYQQhmiVvF4tdvG5CEqxrxMnm5EHxq2uBjzork9ye1W6tllgzBiZPHx1NxDQlD+B5fy3J")
         setContentView(R.layout.activity_main)
 
         val navView: BottomNavigationView = findViewById(R.id.nav_view)

@@ -1,11 +1,26 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id 'com.huawei.agconnect'
 }
 
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
+
+    signingConfigs {
+        release {
+            // 签名证书
+            storeFile file("ZZP.jks")
+            // 密钥库口令
+            storePassword "zzp030224"
+            // 别名
+            keyAlias "zzp"
+            // 密钥口令
+            keyPassword "zzp030224"
+            v2SigningEnabled true
+        }
+    }
 
     defaultConfig {
         applicationId "com.zzp.dtrip"
@@ -21,6 +36,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+        debug {
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {
@@ -33,6 +52,7 @@ android {
     buildFeatures {
         viewBinding true
     }
+
 }
 
 dependencies {
@@ -51,4 +71,5 @@ dependencies {
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    implementation 'com.huawei.hms:maps:6.0.0.301'
 }
