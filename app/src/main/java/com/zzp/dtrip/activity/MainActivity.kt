@@ -1,8 +1,9 @@
-package com.zzp.dtrip
+package com.zzp.dtrip.activity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.zzp.dtrip.R
 import com.zzp.dtrip.fragment.MineFragment
 import com.zzp.dtrip.fragment.TripFragment
 
