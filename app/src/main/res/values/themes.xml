@@ -3,7 +3,7 @@
     <style name="Theme.DTrip" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/blue</item>
-        <item name="colorPrimaryVariant">#215CF3</item>
+        <item name="colorPrimaryVariant">#3F51B5</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/blue</item>

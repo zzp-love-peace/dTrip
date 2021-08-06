@@ -71,4 +71,8 @@ dependencies {
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.tencent.map:tencent-map-vector-sdk:4.3.5'
+    implementation 'com.tencent.map.geolocation:TencentLocationSdk-openplatform:7.3.0'
+    implementation 'pub.devrel:easypermissions:3.0.0'
 }

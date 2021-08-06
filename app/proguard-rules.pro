@@ -19,12 +19,26 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
--ignorewarnings
--keepattributes *Annotation*
--keepattributes Exceptions
--keepattributes InnerClasses
--keepattributes Signature
--keepattributes SourceFile,LineNumberTable
--keep class com.huawei.hianalytics.**{*;}
--keep class com.huawei.updatesdk.**{*;}
--keep class com.huawei.hms.**{*;}
+-keep class com.tencent.tencentmap.**{*;}
+-keep class com.tencent.map.**{*;}
+-keep class com.tencent.beacontmap.**{*;}
+-keep class navsns.**{*;}
+-dontwarn com.qq.**
+-dontwarn com.tencent.**
+
+-keepclassmembers class ** {
+    public void on*Event(...);
+}
+
+-keep class c.t.**{*;}
+-keep class com.tencent.map.geolocation.**{*;}
+
+-keep public class com.tencent.location.**{
+    public protected *;
+}
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
+
+-dontwarn  org.eclipse.jdt.annotation.**
+-dontwarn  c.t.**
