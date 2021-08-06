@@ -15,11 +15,9 @@ import com.tencent.map.geolocation.TencentLocation
 import com.tencent.map.geolocation.TencentLocationListener
 import com.tencent.map.geolocation.TencentLocationManager
 import com.tencent.map.geolocation.TencentLocationRequest
-import com.tencent.tencentmap.mapsdk.maps.LocationSource
+import com.tencent.tencentmap.mapsdk.maps.*
 import com.tencent.tencentmap.mapsdk.maps.LocationSource.OnLocationChangedListener
-import com.tencent.tencentmap.mapsdk.maps.MapView
-import com.tencent.tencentmap.mapsdk.maps.TencentMap
-import com.tencent.tencentmap.mapsdk.maps.UiSettings
+import com.tencent.tencentmap.mapsdk.maps.model.MarkerOptions
 import com.tencent.tencentmap.mapsdk.maps.model.MyLocationStyle
 import com.tencent.tencentmap.mapsdk.maps.model.MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER
 import com.zzp.dtrip.R
@@ -42,6 +40,9 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
     private var locationChangedListener: OnLocationChangedListener? = null
 
     private val TAG = "TripFragment"
+
+
+    private var flag = false
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -72,7 +73,12 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         uiSettings = tencentMap.uiSettings
         uiSettings.isMyLocationButtonEnabled = true
         uiSettings.isCompassEnabled = true
-        tencentMap.setMyLocationStyle(MyLocationStyle().myLocationType(LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER))
+        tencentMap.setMyLocationStyle(MyLocationStyle().
+            myLocationType(LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER))
+
+//        //添加一个地图中心点标注
+//        var marker = tencentMap.addMarker(MarkerOptions(tencentMap.cameraPosition.target))
+
     }
 
     override fun onStart() {
@@ -115,6 +121,18 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
                 location.bearing = tencentLocation.bearing
                 //将位置信息返回给地图
                 locationChangedListener!!.onLocationChanged(location)
+                if (!flag) {
+                    //设置一个新的地图中心点标注
+                    //设置一个新的地图中心点标注
+                    val newLatLng = tencentMap.cameraPosition.target
+                    //把地图变换到指定的状态,生成一个把地图移动到指定的经纬度到屏幕中心的状态变化对象
+                    //把地图变换到指定的状态,生成一个把地图移动到指定的经纬度到屏幕中心的状态变化对象
+                    newLatLng.latitude = tencentLocation.latitude
+                    newLatLng.longitude = tencentLocation.longitude
+                    tencentMap.moveCamera(CameraUpdateFactory.newLatLng(newLatLng))
+                    tencentMap.addMarker(MarkerOptions(newLatLng))
+                    flag = !flag
+                }
             }
         }
     }
