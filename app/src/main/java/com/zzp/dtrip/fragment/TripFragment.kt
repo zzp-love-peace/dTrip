@@ -51,7 +51,6 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         requirePermission()
         initRequest()
         locationManager = TencentLocationManager.getInstance(requireContext())
-        locationManager.requestLocationUpdates(locationRequest, this, Looper.getMainLooper())
         mapView = root.findViewById(R.id.map_view)
         //获取地图实例
         tencentMap = mapView.map
@@ -99,7 +98,6 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
     override fun onDestroy() {
         super.onDestroy()
         mapView.onDestroy()
-        locationManager.removeUpdates(this);
     }
 
     override fun onLocationChanged(tencentLocation: TencentLocation?, error: Int, reason: String?) {
