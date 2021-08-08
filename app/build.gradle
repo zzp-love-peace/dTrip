@@ -68,6 +68,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.3.0'
     implementation 'androidx.navigation:navigation-ui-ktx:2.3.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
@@ -75,4 +76,8 @@ dependencies {
     implementation 'com.tencent.map:tencent-map-vector-sdk:4.3.5'
     implementation 'com.tencent.map.geolocation:TencentLocationSdk-openplatform:7.3.0'
     implementation 'pub.devrel:easypermissions:3.0.0'
+
+
+
+
 }
