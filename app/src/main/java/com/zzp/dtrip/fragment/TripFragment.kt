@@ -1,6 +1,7 @@
 package com.zzp.dtrip.fragment
 
 import android.Manifest
+import android.content.Intent
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
@@ -8,6 +9,7 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
@@ -21,6 +23,7 @@ import com.tencent.tencentmap.mapsdk.maps.model.MarkerOptions
 import com.tencent.tencentmap.mapsdk.maps.model.MyLocationStyle
 import com.tencent.tencentmap.mapsdk.maps.model.MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER
 import com.zzp.dtrip.R
+import com.zzp.dtrip.activity.SearchableActivity
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
 
@@ -28,6 +31,8 @@ import pub.devrel.easypermissions.EasyPermissions
 class TripFragment : Fragment(), TencentLocationListener, LocationSource {
 
     private lateinit var mapView: MapView
+
+    private lateinit var searchBadge: LinearLayout
 
     private lateinit var tencentMap: TencentMap
 
@@ -53,6 +58,11 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         initRequest()
         locationManager = TencentLocationManager.getInstance(requireContext())
         mapView = root.findViewById(R.id.map_view)
+        searchBadge = root.findViewById(R.id.search_badge)
+        searchBadge.setOnClickListener {
+            val intent = Intent(context, SearchableActivity::class.java)
+            startActivity(intent)
+        }
         //获取地图实例
         tencentMap = mapView.map
 
