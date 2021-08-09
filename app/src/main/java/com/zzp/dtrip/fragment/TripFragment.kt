@@ -1,13 +1,17 @@
 package com.zzp.dtrip.fragment
 
 import android.Manifest
+import android.content.Intent
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
@@ -21,6 +25,7 @@ import com.tencent.tencentmap.mapsdk.maps.model.MarkerOptions
 import com.tencent.tencentmap.mapsdk.maps.model.MyLocationStyle
 import com.tencent.tencentmap.mapsdk.maps.model.MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER
 import com.zzp.dtrip.R
+import com.zzp.dtrip.activity.SearchActivity
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
 
@@ -37,12 +42,23 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
 
     private lateinit var uiSettings: UiSettings
 
+    private lateinit var hearingButton: ImageButton
+    private lateinit var sayingButton: ImageButton
+    private lateinit var aroundButton: ImageButton
+
+    private lateinit var searchEdit: EditText
+
     private var locationChangedListener: OnLocationChangedListener? = null
 
     private val TAG = "TripFragment"
 
-
     private var flag = false
+
+
+    companion object {
+        var city = ""
+        var postion = -1
+    }
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -50,9 +66,10 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         val root: View = inflater.inflate(R.layout.fragment_trip, container, false)
 
         requirePermission()
+        findViewById(root)
         initRequest()
         locationManager = TencentLocationManager.getInstance(requireContext())
-        mapView = root.findViewById(R.id.map_view)
+
         //获取地图实例
         tencentMap = mapView.map
 
@@ -61,7 +78,30 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
             //地图正常显示
             initMap()
         }
+        searchEdit.setOnFocusChangeListener { v, hasFocus ->
+            if (!hasFocus) return@setOnFocusChangeListener
+            val intent = Intent(requireActivity(), SearchActivity::class.java)
+            startActivity(intent)
+        }
+
+        hearingButton.setOnClickListener {
+
+        }
+        sayingButton.setOnClickListener {
+
+        }
+        aroundButton.setOnClickListener {
+
+        }
         return root
+    }
+
+    private fun findViewById(root: View) {
+        mapView = root.findViewById(R.id.map_view)
+        hearingButton = root.findViewById(R.id.hearing_button)
+        sayingButton = root.findViewById(R.id.saying_button)
+        aroundButton = root.findViewById(R.id.around_button)
+        searchEdit = root.findViewById(R.id.search_edit)
     }
 
     private fun initMap() {
@@ -76,9 +116,6 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         tencentMap.setMyLocationStyle(MyLocationStyle().
             myLocationType(LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER))
 
-//        //添加一个地图中心点标注
-//        var marker = tencentMap.addMarker(MarkerOptions(tencentMap.cameraPosition.target))
-
     }
 
     override fun onStart() {
@@ -89,6 +126,10 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
     override fun onResume() {
         super.onResume()
         mapView.onResume()
+        searchEdit.clearFocus()
+        if (postion != -1) {
+            searchEdit.setText(SearchActivity.resultList[postion].title)
+        }
     }
 
     override fun onPause() {
@@ -111,6 +152,7 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         //用户通过这个监听器就可以设置地图的定位点位置
         if (error == TencentLocation.ERROR_OK && locationChangedListener != null) {
             if (tencentLocation != null) {
+                city = tencentLocation.city
                 val location = Location(tencentLocation.provider)
                 //设置经纬度
                 location.latitude = tencentLocation.latitude
