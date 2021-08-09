@@ -32,6 +32,10 @@
             android:name=".activity.SearchableActivity"
             android:exported="true" />
 
+        <activity android:name=".activity.SearchActivity">
+
+        </activity>
+
         <meta-data
             android:name="TencentMapSDK"
             android:value="F5IBZ-US3CW-3JIRY-OKBB5-TUMWV-S7BVZ" />
