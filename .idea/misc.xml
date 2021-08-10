@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/GitHub/dTrip/app/src/main/res/drawable-anydpi/ic_back.xml" value="0.3203125" />
+        <entry key="..\:/GitHub/dTrip/app/src/main/res/drawable-anydpi/ic_mine.xml" value="0.1" />
+        <entry key="..\:/GitHub/dTrip/app/src/main/res/drawable-anydpi/ic_search.xml" value="0.3203125" />
+        <entry key="..\:/GitHub/dTrip/app/src/main/res/drawable-anydpi/ic_trip.xml" value="0.20092592592592592" />
+        <entry key="..\:/GitHub/dTrip/app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="..\:/GitHub/dTrip/app/src/main/res/layout/activity_searchable.xml" value="0.30416666666666664" />
+        <entry key="..\:/GitHub/dTrip/app/src/main/res/layout/address_item.xml" value="0.30416666666666664" />
+        <entry key="..\:/GitHub/dTrip/app/src/main/res/layout/fragment_mine.xml" value="0.30416666666666664" />
+        <entry key="..\:/GitHub/dTrip/app/src/main/res/layout/fragment_register.xml" value="0.30416666666666664" />
+        <entry key="..\:/GitHub/dTrip/app/src/main/res/layout/fragment_trip.xml" value="0.22" />
+        <entry key="..\:/GitHub/dTrip/app/src/main/res/menu/bottom_nav_menu.xml" value="0.2796296296296296" />
+      </map>
+    </option>
+  </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
   <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
