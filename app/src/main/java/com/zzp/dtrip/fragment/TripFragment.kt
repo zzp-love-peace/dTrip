@@ -33,6 +33,11 @@ import pub.devrel.easypermissions.EasyPermissions
 
 class TripFragment : Fragment(), TencentLocationListener, LocationSource {
 
+    companion object {
+        var city = ""
+        var position = -1
+    }
+
     private lateinit var mapView: MapView
 
     private lateinit var tencentMap: TencentMap
@@ -49,14 +54,11 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
     private lateinit var sayingButton: ImageButton
     private lateinit var hearingButton: ImageButton
 
+
     private var locationChangedListener: OnLocationChangedListener? = null
 
     private val TAG = "TripFragment"
 
-    companion object {
-        var city = ""
-        var position = -1
-    }
     private var flag = false
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -69,8 +71,8 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         findViewById(root)
 
         locationManager = TencentLocationManager.getInstance(requireContext())
-
         searchEdit.setOnFocusChangeListener { v, hasFocus ->
+            if (!hasFocus) return@setOnFocusChangeListener
             val intent = Intent(requireContext(), SearchActivity::class.java)
             startActivity(intent)
         }
@@ -107,10 +109,6 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         uiSettings.isCompassEnabled = true
         tencentMap.setMyLocationStyle(MyLocationStyle().
             myLocationType(LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER))
-
-//        //添加一个地图中心点标注
-//        var marker = tencentMap.addMarker(MarkerOptions(tencentMap.cameraPosition.target))
-
     }
 
     override fun onStart() {
