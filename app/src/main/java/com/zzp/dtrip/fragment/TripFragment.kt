@@ -49,16 +49,10 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
 
     private lateinit var uiSettings: UiSettings
 
-    private lateinit var searchEdit: EditText
-
     private var locationChangedListener: OnLocationChangedListener? = null
 
     private val TAG = "TripFragment"
 
-    companion object {
-        var city = ""
-        var position = -1
-    }
     private var flag = false
 
     @RequiresApi(Build.VERSION_CODES.Q)
