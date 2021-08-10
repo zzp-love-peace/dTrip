@@ -32,9 +32,14 @@ import pub.devrel.easypermissions.EasyPermissions
 
 class TripFragment : Fragment(), TencentLocationListener, LocationSource {
 
+    companion object {
+        var city = ""
+        var position = -1
+    }
+
     private lateinit var mapView: MapView
 
-    private lateinit var searchBadge: LinearLayout
+    private lateinit var searchEdit: EditText
 
     private lateinit var tencentMap: TencentMap
 
@@ -65,8 +70,8 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         initRequest()
         locationManager = TencentLocationManager.getInstance(requireContext())
         mapView = root.findViewById(R.id.map_view)
-        searchBadge = root.findViewById(R.id.search_badge)
-        searchBadge.setOnClickListener {
+        searchEdit = root.findViewById(R.id.search_edit)
+        searchEdit.setOnClickListener {
             val intent = Intent(context, SearchableActivity::class.java)
             startActivity(intent)
         }
