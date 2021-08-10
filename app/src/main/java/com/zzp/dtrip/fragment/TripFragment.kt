@@ -54,10 +54,9 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
 
     private var flag = false
 
-
     companion object {
         var city = ""
-        var postion = -1
+        var position = -1
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -127,8 +126,8 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         super.onResume()
         mapView.onResume()
         searchEdit.clearFocus()
-        if (postion != -1) {
-            searchEdit.setText(SearchActivity.resultList[postion].title)
+        if (position != -1) {
+            searchEdit.setText(SearchActivity.resultList[position].title)
         }
     }
 

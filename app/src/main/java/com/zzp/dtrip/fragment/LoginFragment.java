@@ -38,7 +38,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     private TextView textview_account;
     private TextView textview_password;
     private CheckBox checkbox_password;
-    private Button button_register;
+    private TextView text_register;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,7 +47,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         textview_account=root.findViewById(R.id.account_layout);
         textview_password=root.findViewById(R.id.password_layout);
         checkbox_password=root.findViewById(R.id.remember_button);
-        button_register=root.findViewById( R.id.register_button);
+        text_register=root.findViewById( R.id.register_text);
 
 
 
@@ -67,7 +67,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         {
             case R.id.remember_button:if(checkbox_password.isChecked());break;
             case R.id.account_layout:Login(textview_account.getText().toString(),textview_password.getText().toString());break;
-            case R.id.register_button:break;
+            case R.id.register_text:break;
         }
 
 

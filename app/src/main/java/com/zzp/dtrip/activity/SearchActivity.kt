@@ -3,8 +3,6 @@ package com.zzp.dtrip.activity
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -69,14 +67,17 @@ class SearchActivity : AppCompatActivity() {
     private fun initRecyclerView() {
         val layoutManager = LinearLayoutManager(this)
         recyclerView.layoutManager = layoutManager
+        if (TripFragment.position == -1) {
+            resultList.clear()
+        }
         adapter = AddressAdapter(this, resultList)
         recyclerView.adapter = adapter
         recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
     }
 
     private fun initEdit() {
-        if(TripFragment.postion != -1) {
-            keyword = resultList[TripFragment.postion].title
+        if(TripFragment.position != -1) {
+            keyword = resultList[TripFragment.position].title
             searchEdit.setText(keyword)
             getSuggestion()
         }

@@ -26,7 +26,7 @@ class AddressAdapter(private val activity: Activity, private val resultList: Lis
         inflate(R.layout.address_item, parent, false)
         val viewHolder = ViewHolder(view)
         viewHolder.itemView.setOnClickListener {
-            TripFragment.postion = viewHolder.adapterPosition
+            TripFragment.position = viewHolder.adapterPosition
             activity.onBackPressed()
         }
         return viewHolder
