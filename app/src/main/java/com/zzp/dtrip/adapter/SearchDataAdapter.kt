@@ -15,7 +15,7 @@ class SearchDataAdapter(private val searchData: SearchAPIHelper.Response<List<Se
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val title: TextView = view.findViewById(R.id.title)
-        val address: TextView = view.findViewById(R.id.address)
+        val address: TextView = view.findViewById(R.id.address_text)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

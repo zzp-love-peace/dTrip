@@ -77,7 +77,4 @@ dependencies {
     implementation 'com.tencent.map.geolocation:TencentLocationSdk-openplatform:7.3.0'
     implementation 'pub.devrel:easypermissions:3.0.0'
 
-
-
-
 }

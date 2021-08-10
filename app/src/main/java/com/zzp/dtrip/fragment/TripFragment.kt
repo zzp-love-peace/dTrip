@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -34,8 +35,6 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
 
     private lateinit var mapView: MapView
 
-    private lateinit var searchBadge: LinearLayout
-
     private lateinit var tencentMap: TencentMap
 
     private lateinit var locationManager: TencentLocationManager
@@ -45,6 +44,10 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
     private lateinit var uiSettings: UiSettings
 
     private lateinit var searchEdit: EditText
+
+    private lateinit var aroundButton: ImageButton
+    private lateinit var sayingButton: ImageButton
+    private lateinit var hearingButton: ImageButton
 
     private var locationChangedListener: OnLocationChangedListener? = null
 
@@ -63,11 +66,12 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
 
         requirePermission()
         initRequest()
+        findViewById(root)
+
         locationManager = TencentLocationManager.getInstance(requireContext())
-        mapView = root.findViewById(R.id.map_view)
-        searchBadge = root.findViewById(R.id.search_badge)
-        searchBadge.setOnClickListener {
-            val intent = Intent(context, SearchableActivity::class.java)
+
+        searchEdit.setOnFocusChangeListener { v, hasFocus ->
+            val intent = Intent(requireContext(), SearchActivity::class.java)
             startActivity(intent)
         }
         //获取地图实例
@@ -78,7 +82,18 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
             //地图正常显示
             initMap()
         }
+        sayingButton.setOnClickListener {  }
+        hearingButton.setOnClickListener {  }
+        aroundButton.setOnClickListener {  }
         return root
+    }
+
+    private fun findViewById(root: View) {
+        mapView = root.findViewById(R.id.map_view)
+        searchEdit = root.findViewById(R.id.search_edit)
+        sayingButton = root.findViewById(R.id.saying_button)
+        hearingButton = root.findViewById(R.id.hearing_button)
+        aroundButton = root.findViewById(R.id.around_button)
     }
 
     private fun initMap() {
