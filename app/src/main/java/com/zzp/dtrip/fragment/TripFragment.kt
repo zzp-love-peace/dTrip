@@ -21,6 +21,8 @@ import com.tencent.map.geolocation.TencentLocationManager
 import com.tencent.map.geolocation.TencentLocationRequest
 import com.tencent.tencentmap.mapsdk.maps.*
 import com.tencent.tencentmap.mapsdk.maps.LocationSource.OnLocationChangedListener
+import com.tencent.tencentmap.mapsdk.maps.model.LatLng
+import com.tencent.tencentmap.mapsdk.maps.model.Marker
 import com.tencent.tencentmap.mapsdk.maps.model.MarkerOptions
 import com.tencent.tencentmap.mapsdk.maps.model.MyLocationStyle
 import com.tencent.tencentmap.mapsdk.maps.model.MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER
@@ -42,6 +44,9 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
     private lateinit var mapView: MapView
 
     private lateinit var tencentMap: TencentMap
+
+    // 用来展示搜索结果的 Marker
+    private var targetMarker: Marker? = null
 
     private lateinit var locationManager: TencentLocationManager
 
@@ -144,6 +149,10 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
             sheetTitleText.text = SearchActivity.resultList[position].title
             sheetAddressText.text = SearchActivity.resultList[position].address
             sheetLayout.visibility = View.VISIBLE
+            // 标注并将地图定位移动至对应坐标
+            val targetPosition = LatLng(SearchActivity.resultList[position].location.lat, SearchActivity.resultList[position].location.lng)
+            targetMarker = tencentMap.addMarker(MarkerOptions(targetPosition))
+            tencentMap.animateCamera(CameraUpdateFactory.newLatLng(targetPosition))
         }
         openingSearch = false
     }
@@ -152,6 +161,7 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         super.onPause()
         if (!openingSearch)
             mapView.onPause()
+        targetMarker?.remove()
     }
 
     override fun onStop() {
