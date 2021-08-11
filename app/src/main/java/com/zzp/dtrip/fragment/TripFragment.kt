@@ -10,11 +10,11 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.Toast
+import android.widget.*
 import androidx.annotation.RequiresApi
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.tencent.map.geolocation.TencentLocation
 import com.tencent.map.geolocation.TencentLocationListener
 import com.tencent.map.geolocation.TencentLocationManager
@@ -55,6 +55,11 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
     private lateinit var sayingButton: ImageButton
     private lateinit var hearingButton: ImageButton
 
+    private lateinit var sheetLayout: CoordinatorLayout
+    private lateinit var sheetContent: ScrollView
+    private lateinit var sheetContentBehavior: BottomSheetBehavior<ScrollView>
+    private lateinit var sheetTitleText: TextView
+    private lateinit var sheetAddressText: TextView
 
     private var locationChangedListener: OnLocationChangedListener? = null
 
@@ -100,6 +105,11 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         sayingButton = root.findViewById(R.id.saying_button)
         hearingButton = root.findViewById(R.id.hearing_button)
         aroundButton = root.findViewById(R.id.around_button)
+        sheetLayout = root.findViewById(R.id.search_result_sheet)
+        sheetContent = root.findViewById(R.id.search_result_sheet_layout)
+        sheetContentBehavior = BottomSheetBehavior.from(sheetContent)
+        sheetTitleText = root.findViewById(R.id.sheet_title_text)
+        sheetAddressText = root.findViewById(R.id.sheet_address_text)
     }
 
     private fun initMap() {
@@ -124,8 +134,12 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         super.onResume()
         mapView.onResume()
         searchEdit.clearFocus()
+        sheetContentBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         if (position != -1) {
             searchEdit.setText(SearchActivity.resultList[position].title)
+            sheetTitleText.text = SearchActivity.resultList[position].title
+            sheetAddressText.text = SearchActivity.resultList[position].address
+            sheetLayout.visibility = View.VISIBLE
         }
     }
 
