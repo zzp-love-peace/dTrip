@@ -74,10 +74,11 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         locationManager = TencentLocationManager.getInstance(requireContext())
         searchEdit.setOnFocusChangeListener { v, hasFocus ->
             if (!hasFocus) return@setOnFocusChangeListener
-            val options = ActivityOptions.makeSceneTransitionAnimation(requireActivity(), v, "search_edit")
+//            val options = ActivityOptions.makeSceneTransitionAnimation(requireActivity(), v, "search_edit")
             // start the new activity
-            val intent = Intent(requireContext(), SearchActivity::class.java)
-            startActivity(intent, options.toBundle())
+            val intent = Intent(requireActivity(), SearchActivity::class.java)
+//            startActivity(intent, options.toBundle())
+            startActivity(intent)
         }
         //获取地图实例
         tencentMap = mapView.map

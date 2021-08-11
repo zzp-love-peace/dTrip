@@ -29,11 +29,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DTrip">
 
-
         <meta-data
             android:name="TencentMapSDK"
             android:value="F5IBZ-US3CW-3JIRY-OKBB5-TUMWV-S7BVZ" />
-
+        <activity android:name=".activity.SearchActivity" />
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/app_name"
