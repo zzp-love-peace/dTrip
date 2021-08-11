@@ -3,9 +3,5 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:duration="200"
     android:interpolator="@android:interpolator/fast_out_slow_in">
-    <changeBounds>
-        <targets>
-            <target android:targetId="@id/search_edit"/>
-        </targets>
-    </changeBounds>
+    <changeBounds/>
 </transitionSet>
