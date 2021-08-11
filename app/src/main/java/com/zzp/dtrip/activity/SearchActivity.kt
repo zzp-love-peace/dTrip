@@ -17,6 +17,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.zzp.dtrip.R
 import com.zzp.dtrip.adapter.AddressAdapter
 import com.zzp.dtrip.data.Data
+import com.zzp.dtrip.data.DataX
+import com.zzp.dtrip.data.ExploreResult
 import com.zzp.dtrip.data.SuggestionResult
 import com.zzp.dtrip.fragment.TripFragment
 import com.zzp.dtrip.util.TencentAppService
@@ -51,6 +53,8 @@ class SearchActivity : AppCompatActivity() {
         findViewById()
         initRecyclerView()
         initEdit()
+        getExplore()
+
         searchButton.setOnClickListener {
             keyword = searchEdit.text.toString()
             if (keyword.trim().isEmpty()) {
@@ -65,6 +69,7 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        Log.d(TAG, "onResume: ")
         // 使 EditText 默认获得焦点
         searchEdit.requestFocus()
         (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).showSoftInput(searchEdit, InputMethodManager.SHOW_IMPLICIT)
@@ -100,6 +105,7 @@ class SearchActivity : AppCompatActivity() {
                 getSuggestion()
             }
         }
+
     }
 
     private fun getSuggestion() {
@@ -131,4 +137,39 @@ class SearchActivity : AppCompatActivity() {
             }
         })
     }
+
+    private fun getExplore() {
+        val appService = TencentRetrofitManager.create<TencentAppService>()
+        val boundary = "nearby(${TripFragment.lat},${TripFragment.lng},1000)"
+        val task = appService.getExplore(boundary, KEY)
+        task.enqueue(object : Callback<ExploreResult>{
+            override fun onResponse(call: Call<ExploreResult>,
+                                    response: Response<ExploreResult>) {
+                response.body()?.apply {
+                    if (this.status == 0) {
+                        if (resultList.size != 0) {
+                            resultList.clear()
+                        }
+                        for (obj in this.data) {
+                            val dataX = Data(obj.ad_info.adcode, obj.address, obj.category,
+                                obj.ad_info.city, obj.ad_info.district, obj.id, obj.location,
+                                obj.ad_info.province, obj.title, 0)
+                            resultList.add(dataX)
+                        }
+                        adapter?.notifyDataSetChanged()
+                    }
+                    else {
+                        Toast.makeText(this@SearchActivity, "请求错误",
+                            Toast.LENGTH_SHORT).show()
+                        Log.d(TAG, "onResponse: ${this.status}" )
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<ExploreResult>, t: Throwable) {
+                Log.d(TAG, "onFailure ==> $t")
+            }
+        })
+    }
+
 }

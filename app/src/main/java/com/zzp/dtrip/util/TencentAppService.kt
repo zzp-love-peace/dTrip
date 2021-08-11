@@ -1,5 +1,6 @@
 package com.zzp.dtrip.util
 
+import com.zzp.dtrip.data.ExploreResult
 import com.zzp.dtrip.data.SuggestionResult
 import retrofit2.Call
 import retrofit2.http.GET
@@ -10,4 +11,8 @@ interface TencentAppService {
     fun getSuggestion(@Query("keyword") keyword: String,
                       @Query("region") region: String,
                       @Query("key") key: String) : Call<SuggestionResult>
+
+    @GET("/ws/place/v1/explore")
+    fun getExplore(@Query("boundary") boundary: String,
+                   @Query("key") key: String) : Call<ExploreResult>
 }

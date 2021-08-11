@@ -12,7 +12,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
@@ -37,6 +36,8 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
     companion object {
         var city = ""
         var position = -1
+        var lat = 0.0
+        var lng = 0.0
     }
 
     private lateinit var mapView: MapView
@@ -148,10 +149,13 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         //用户通过这个监听器就可以设置地图的定位点位置
         if (error == TencentLocation.ERROR_OK && locationChangedListener != null) {
             if (tencentLocation != null) {
+                city = tencentLocation.city
                 val location = Location(tencentLocation.provider)
                 //设置经纬度
                 location.latitude = tencentLocation.latitude
                 location.longitude = tencentLocation.longitude
+                lat = tencentLocation.latitude
+                lng = tencentLocation.longitude
                 //设置精度，这个值会被设置为定位点上表示精度的圆形半径
                 location.accuracy = tencentLocation.accuracy
                 //设置定位标的旋转角度，注意 tencentLocation.getBearing() 只有在 gps 时才有可能获取
