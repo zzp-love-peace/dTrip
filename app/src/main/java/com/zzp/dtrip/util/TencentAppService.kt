@@ -15,4 +15,5 @@ interface TencentAppService {
     @GET("/ws/place/v1/explore")
     fun getExplore(@Query("boundary") boundary: String,
                    @Query("key") key: String) : Call<ExploreResult>
+
 }

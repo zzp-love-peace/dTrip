@@ -13,7 +13,7 @@ import com.zzp.dtrip.R
 import com.zzp.dtrip.data.Data
 import com.zzp.dtrip.fragment.TripFragment
 
-class AddressAdapter(private val activity: Activity, private val resultList: List<Data>) :
+class  AddressAdapter(private val activity: Activity, private val resultList: List<Data>) :
     RecyclerView.Adapter<AddressAdapter.ViewHolder>() {
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view){

@@ -151,10 +151,10 @@ class SearchActivity : AppCompatActivity() {
                             resultList.clear()
                         }
                         for (obj in this.data) {
-                            val dataX = Data(obj.ad_info.adcode, obj.address, obj.category,
+                            val objs = Data(obj.ad_info.adcode, obj.address, obj.category,
                                 obj.ad_info.city, obj.ad_info.district, obj.id, obj.location,
                                 obj.ad_info.province, obj.title, 0)
-                            resultList.add(dataX)
+                            resultList.add(objs)
                         }
                         adapter?.notifyDataSetChanged()
                     }
