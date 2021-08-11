@@ -99,6 +99,7 @@
         android:background="@drawable/input_background"
         android:drawableStart="@drawable/ic_search"
         android:inputType="text"
+        android:transitionName="search_edit"
         app:layout_constraintBottom_toTopOf="@+id/guideline2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

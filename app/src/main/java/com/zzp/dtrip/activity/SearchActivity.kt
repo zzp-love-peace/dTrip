@@ -1,11 +1,16 @@
 package com.zzp.dtrip.activity
 
+import android.app.ActivityOptions
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Editable
 import android.util.Log
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -58,6 +63,13 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        // 使 EditText 默认获得焦点
+        searchEdit.requestFocus()
+        (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).showSoftInput(searchEdit, InputMethodManager.SHOW_IMPLICIT)
+    }
+
     private fun findViewById() {
         searchEdit = findViewById(R.id.search_edit)
         searchButton = findViewById(R.id.search_button)
@@ -81,7 +93,13 @@ class SearchActivity : AppCompatActivity() {
             searchEdit.setText(keyword)
             getSuggestion()
         }
-
+        // 监听 EditText 以实现自动搜索
+        searchEdit.addTextChangedListener { text: Editable? ->
+            if (!text?.toString().isNullOrEmpty()) {
+                keyword = text.toString()
+                getSuggestion()
+            }
+        }
     }
 
     private fun getSuggestion() {

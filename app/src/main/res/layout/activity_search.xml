@@ -16,6 +16,7 @@
         android:background="@drawable/input_background"
         android:drawableStart="@drawable/ic_search"
         android:inputType="text"
+        android:transitionName="search_edit"
         app:layout_constraintEnd_toStartOf="@+id/search_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -29,6 +30,7 @@
         android:background="@drawable/button_shape"
         android:text="搜索"
         android:textSize="18sp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

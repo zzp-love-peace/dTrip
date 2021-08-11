@@ -1,6 +1,7 @@
 package com.zzp.dtrip.fragment
 
 import android.Manifest
+import android.app.ActivityOptions
 import android.content.Intent
 import android.location.Location
 import android.os.Build
@@ -73,8 +74,10 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         locationManager = TencentLocationManager.getInstance(requireContext())
         searchEdit.setOnFocusChangeListener { v, hasFocus ->
             if (!hasFocus) return@setOnFocusChangeListener
+            val options = ActivityOptions.makeSceneTransitionAnimation(requireActivity(), v, "search_edit")
+            // start the new activity
             val intent = Intent(requireContext(), SearchActivity::class.java)
-            startActivity(intent)
+            startActivity(intent, options.toBundle())
         }
         //获取地图实例
         tencentMap = mapView.map
