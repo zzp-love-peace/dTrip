@@ -67,6 +67,9 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
 
     private var flag = false
 
+    // 避免腾讯地图闪烁
+    private var openingSearch = false
+
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
@@ -79,11 +82,12 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         locationManager = TencentLocationManager.getInstance(requireContext())
         searchEdit.setOnFocusChangeListener { v, hasFocus ->
             if (!hasFocus) return@setOnFocusChangeListener
-//            val options = ActivityOptions.makeSceneTransitionAnimation(requireActivity(), v, "search_edit")
+            val options = ActivityOptions.makeSceneTransitionAnimation(requireActivity(), v, "search_edit")
             // start the new activity
             val intent = Intent(requireActivity(), SearchActivity::class.java)
-//            startActivity(intent, options.toBundle())
-            startActivity(intent)
+            startActivity(intent, options.toBundle())
+            openingSearch = true
+//            startActivity(intent)
         }
         //获取地图实例
         tencentMap = mapView.map
@@ -141,11 +145,13 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
             sheetAddressText.text = SearchActivity.resultList[position].address
             sheetLayout.visibility = View.VISIBLE
         }
+        openingSearch = false
     }
 
     override fun onPause() {
         super.onPause()
-        mapView.onPause()
+        if (!openingSearch)
+            mapView.onPause()
     }
 
     override fun onStop() {

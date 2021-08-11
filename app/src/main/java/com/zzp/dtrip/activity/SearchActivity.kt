@@ -4,6 +4,7 @@ import android.app.ActivityOptions
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.text.Editable
 import android.util.Log
 import android.view.inputmethod.InputMethodManager
@@ -71,8 +72,10 @@ class SearchActivity : AppCompatActivity() {
         super.onResume()
         Log.d(TAG, "onResume: ")
         // 使 EditText 默认获得焦点
-        searchEdit.requestFocus()
-        (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).showSoftInput(searchEdit, InputMethodManager.SHOW_IMPLICIT)
+        Handler(mainLooper).postDelayed({
+            searchEdit.requestFocus()
+            (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).showSoftInput(searchEdit, InputMethodManager.SHOW_IMPLICIT)
+        }, 400)
     }
 
     private fun findViewById() {
