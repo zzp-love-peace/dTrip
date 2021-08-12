@@ -54,7 +54,6 @@ class SearchActivity : AppCompatActivity() {
         initRecyclerView()
         initEdit()
         getExplore()
-
         searchButton.setOnClickListener {
             keyword = searchEdit.text.toString()
             if (keyword.trim().isEmpty()) {

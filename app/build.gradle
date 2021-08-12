@@ -76,5 +76,11 @@ dependencies {
     implementation 'com.tencent.map:tencent-map-vector-sdk:4.3.5'
     implementation 'com.tencent.map.geolocation:TencentLocationSdk-openplatform:7.3.0'
     implementation 'pub.devrel:easypermissions:3.0.0'
-
+    // 引入实时语音识别服务插件
+    implementation 'com.huawei.hms:ml-computer-voice-asr-plugin:3.0.0.301'
+    // 引入实时语音识别服务SDK
+    implementation 'com.huawei.hms:ml-computer-voice-asr:3.0.0.301'
+    // 引入声音识别集合包
+    implementation 'com.huawei.hms:ml-speech-semantics-sounddect-sdk:2.1.0.300'
+    implementation 'com.huawei.hms:ml-speech-semantics-sounddect-model:2.1.0.300'
 }

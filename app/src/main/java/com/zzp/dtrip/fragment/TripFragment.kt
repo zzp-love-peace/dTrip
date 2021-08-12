@@ -1,7 +1,6 @@
 package com.zzp.dtrip.fragment
 
 import android.Manifest
-import android.app.ActivityOptions
 import android.content.Intent
 import android.location.Location
 import android.os.Build
@@ -26,6 +25,8 @@ import com.tencent.tencentmap.mapsdk.maps.model.MyLocationStyle
 import com.tencent.tencentmap.mapsdk.maps.model.MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER
 import com.zzp.dtrip.R
 import com.zzp.dtrip.activity.SearchActivity
+import com.zzp.dtrip.activity.SocialActivity
+import com.zzp.dtrip.activity.SoundActivity
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
 
@@ -88,8 +89,14 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
             //地图正常显示
             initMap()
         }
-        sayingButton.setOnClickListener {  }
-        hearingButton.setOnClickListener {  }
+        sayingButton.setOnClickListener {
+            val intent = Intent(requireContext(), SocialActivity::class.java)
+            startActivity(intent)
+        }
+        hearingButton.setOnClickListener {
+            val intent = Intent(requireContext(), SoundActivity::class.java)
+            startActivity(intent)
+        }
         aroundButton.setOnClickListener {  }
         return root
     }
