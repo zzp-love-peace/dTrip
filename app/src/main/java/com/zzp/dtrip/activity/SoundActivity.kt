@@ -22,16 +22,20 @@ class SoundActivity : AppCompatActivity() {
 
     private lateinit var myBinder: SoundService.MyBinder
 
+    private lateinit var soundService: SoundService
+
     private lateinit var myReceiver: BroadcastReceiver
 
     private lateinit var notifyText: TextView
 
     private lateinit var switchMaterial: SwitchMaterial
 
-    private val connection =  object : ServiceConnection {
+    private lateinit var prefs: SharedPreferences
 
+    private val connection =  object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
             myBinder = service as SoundService.MyBinder
+            soundService = myBinder.getService()
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -44,8 +48,6 @@ class SoundActivity : AppCompatActivity() {
 
     private val perms = arrayOf(Manifest.permission.RECORD_AUDIO)
     private val RC_RECORD_CODE = 0x123
-
-    private var buttonFlag = true
 
     companion object {
         var swichFlag = false
@@ -60,11 +62,13 @@ class SoundActivity : AppCompatActivity() {
         bindService()
         startService()
         doRegisterReceiver()
+        initPrefAndSwitch()
         initButtonAndText()
 
         stopButton.setOnClickListener {
             myBinder.stopVibrate()
             stopButton.visibility = View.GONE
+
         }
 
         switchMaterial.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -72,9 +76,8 @@ class SoundActivity : AppCompatActivity() {
         }
 
         floatButton.setOnClickListener {
-            floatButton.isSelected = buttonFlag
 
-            if (buttonFlag) {
+            if (!SoundService.buttonFlag) {
                 if (ActivityCompat.checkSelfPermission(this@SoundActivity, Manifest.permission.RECORD_AUDIO)
                     == PackageManager.PERMISSION_GRANTED) {
                     myBinder.start()
@@ -84,8 +87,9 @@ class SoundActivity : AppCompatActivity() {
             else {
                 myBinder.stop()
             }
-            buttonFlag = !buttonFlag
+            SoundService.buttonFlag = !SoundService.buttonFlag
             SoundService.text = ""
+            floatButton.isSelected = SoundService.buttonFlag
             notifyText.text = "声音报警系统"
             notifyText.setTextColor(resources.getColor(R.color.black))
         }
@@ -118,6 +122,7 @@ class SoundActivity : AppCompatActivity() {
     }
 
     private fun initButtonAndText() {
+        floatButton.isSelected = SoundService.buttonFlag
         if (SoundService.isVibrate) {
             stopButton.visibility = View.VISIBLE
             notifyText.setTextColor(resources.getColor(R.color.red))
@@ -142,6 +147,19 @@ class SoundActivity : AppCompatActivity() {
         intentFilter.addAction("com.zzp.SOUND_EVENT_TYPE_STEAM_WHISTLE")
         myReceiver = MyBroadcastReceiver()
         registerReceiver(myReceiver, intentFilter)
+    }
+
+    private fun initPrefAndSwitch() {
+        prefs = getPreferences(Context.MODE_PRIVATE)
+        swichFlag = prefs.getBoolean("switch", false)
+        switchMaterial.isChecked = swichFlag
+        Log.d(TAG, "initPrefAndSwitch: ")
+    }
+
+    private fun saveSwitchFlag() {
+        val edit = prefs.edit()
+        edit.putBoolean("switch", swichFlag)
+        edit.apply()
     }
 
     inner class MyBroadcastReceiver : BroadcastReceiver() {
@@ -212,5 +230,10 @@ class SoundActivity : AppCompatActivity() {
             notifyText.text = SoundService.text
         }
 
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        saveSwitchFlag()
     }
 }

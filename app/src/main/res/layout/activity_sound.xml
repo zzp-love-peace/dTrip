@@ -58,6 +58,7 @@
         android:layout_height="wrap_content"
         android:text="居家模式"
         android:textSize="16sp"
+
         app:switchPadding="10dp"
         app:switchMinWidth="60dp"
         app:layout_constraintBottom_toBottomOf="parent"

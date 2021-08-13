@@ -22,9 +22,13 @@ class SoundService : Service() {
 
     private val TAG = "SoundService"
 
+//   是否震动
     companion object {
         var isVibrate = false
         var text = ""
+        //    stopButton是否隐藏
+        var buttonFlag = false
+        var fabFlag = false
     }
 
     private val listener: MLSoundDectListener = object : MLSoundDectListener {
@@ -186,6 +190,11 @@ class SoundService : Service() {
         fun stopVibrate() {
             mVibrator.cancel()
             Toast.makeText(this@SoundService, "震动停止", Toast.LENGTH_LONG).show()
+            isVibrate = false
+        }
+
+        fun getService(): SoundService {
+            return this@SoundService
         }
     }
 

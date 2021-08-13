@@ -299,12 +299,12 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         tencentMap.setLocationSource(this)
         //设置当前位置可见
         tencentMap.isMyLocationEnabled = true
-
         uiSettings = tencentMap.uiSettings
         uiSettings.isMyLocationButtonEnabled = true
         uiSettings.isCompassEnabled = true
         tencentMap.setMyLocationStyle(MyLocationStyle().
             myLocationType(LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER))
+        tencentMap.animateCamera(CameraUpdateFactory.zoomIn() )
     }
 
     override fun onStart() {
