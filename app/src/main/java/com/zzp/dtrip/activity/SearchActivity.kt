@@ -55,16 +55,6 @@ class SearchActivity : AppCompatActivity() {
         initRecyclerView()
         initEdit()
         getExplore()
-        searchButton.setOnClickListener {
-            keyword = searchEdit.text.toString()
-            if (keyword.trim().isEmpty()) {
-                Toast.makeText(this, "输入为空",
-                    Toast.LENGTH_SHORT).show()
-            }
-            else {
-                getSuggestion()
-            }
-        }
     }
 
     override fun onResume() {
@@ -79,7 +69,6 @@ class SearchActivity : AppCompatActivity() {
 
     private fun findViewById() {
         searchEdit = findViewById(R.id.search_edit)
-        searchButton = findViewById(R.id.search_button)
         recyclerView = findViewById(R.id.address_recycler)
     }
 

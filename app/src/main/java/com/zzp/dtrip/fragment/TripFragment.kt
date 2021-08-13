@@ -310,6 +310,7 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
     override fun onStart() {
         super.onStart()
         mapView.onStart()
+        requireActivity().resources.getDrawable(R.drawable.ic_around)
     }
 
     override fun onResume() {
