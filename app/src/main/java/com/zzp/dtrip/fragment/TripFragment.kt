@@ -80,6 +80,7 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
     private lateinit var hearingButton: ImageButton
 
     private lateinit var sheetLayout: CoordinatorLayout
+    private lateinit var sheetCloseButton: ImageButton
     private lateinit var sheetContent: LinearLayout
     private lateinit var sheetContentBehavior: BottomSheetBehavior<LinearLayout>
     private lateinit var sheetTitleText: TextView
@@ -145,120 +146,125 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
 
         // 选择交通方式
         // TODO: 实现选中路线、绘制道路
-        // TODO: 优化 bottom sheet 呈现方式
-        // TODO: 页面跳转后重置 button 和 recyclerView
+        sheetCloseButton.setOnClickListener {
+            sheetContentBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        }
         arrayOf(sheetRouteDriveButton, sheetRouteWalkButton, sheetRouteTransitButton, sheetRouteBicycleButton).let { array ->
             array.forEach { button ->
                 button.setOnClickListener { _ ->
-                    array.forEach {
-                        it.background = ResourcesCompat.getDrawable(resources, if (button.id == it.id) R.drawable.background_transportation else android.R.color.transparent, requireActivity().theme)
-                    }
-                    // load routes corresponding to selected transportation
-                    when (button.id) {
-                        R.id.sheet_route_drive_button -> { // Drive
-                            val drivingParam = DrivingParam().apply{
-                                from(LatLng(currentLocation.latitude, currentLocation.longitude))
-                                to(LatLng(SearchActivity.resultList[position].location.lat, SearchActivity.resultList[position].location.lng))
-                            }
-                            TencentSearch(requireContext()).getRoutePlan(drivingParam, object: HttpResponseListener<DrivingResultObject> {
-                                override fun onSuccess(p0: Int, p1: DrivingResultObject?) {
-                                    if (p1 != null) {
-                                        if (routeAdapter == null) {
-                                            routeAdapter = RouteAdapter(p1, RouteAdapter.RouteType.Drive, requireContext())
-                                            routeRecycler.adapter = routeAdapter
-                                            routeRecycler.layoutManager = LinearLayoutManager(requireContext())
-                                            routeRecycler.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-                                        } else {
-                                            routeAdapter!!.setData(p1, RouteAdapter.RouteType.Drive)
-                                        }
-                                        routeDivider.visibility = View.VISIBLE
-                                        routeRecycler.visibility = View.VISIBLE
-                                    }
-                                }
-                                override fun onFailure(p0: Int, p1: String?, p2: Throwable?) {
-                                    routeDivider.visibility = View.GONE
-                                    routeRecycler.visibility = View.GONE
-                                }
-                            })
+                    if (::currentLocation.isInitialized) {
+                        array.forEach {
+                            it.background = ResourcesCompat.getDrawable(resources, if (button.id == it.id) R.drawable.background_transportation else android.R.color.transparent, requireActivity().theme)
                         }
-                        R.id.sheet_route_walk_button -> { // Walk
-                            val walkingParam = WalkingParam().apply{
-                                from(LatLng(currentLocation.latitude, currentLocation.longitude))
-                                to(LatLng(SearchActivity.resultList[position].location.lat, SearchActivity.resultList[position].location.lng))
-                            }
-                            TencentSearch(requireContext()).getRoutePlan(walkingParam, object: HttpResponseListener<WalkingResultObject> {
-                                override fun onSuccess(p0: Int, p1: WalkingResultObject?) {
-                                    if (p1 != null) {
-                                        if (routeAdapter == null) {
-                                            routeAdapter = RouteAdapter(p1, RouteAdapter.RouteType.Walk, requireContext())
-                                            routeRecycler.adapter = routeAdapter
-                                            routeRecycler.layoutManager = LinearLayoutManager(requireContext())
-                                            routeRecycler.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-                                        } else {
-                                            routeAdapter!!.setData(p1, RouteAdapter.RouteType.Walk)
+                        // load routes corresponding to selected transportation
+                        when (button.id) {
+                            R.id.sheet_route_drive_button -> { // Drive
+                                val drivingParam = DrivingParam().apply{
+                                    from(LatLng(currentLocation.latitude, currentLocation.longitude))
+                                    to(LatLng(SearchActivity.resultList[position].location.lat, SearchActivity.resultList[position].location.lng))
+                                }
+                                TencentSearch(requireContext()).getRoutePlan(drivingParam, object: HttpResponseListener<DrivingResultObject> {
+                                    override fun onSuccess(p0: Int, p1: DrivingResultObject?) {
+                                        if (p1 != null) {
+                                            if (routeAdapter == null) {
+                                                routeAdapter = RouteAdapter(p1, RouteAdapter.RouteType.Drive, requireContext())
+                                                routeRecycler.adapter = routeAdapter
+                                                routeRecycler.layoutManager = LinearLayoutManager(requireContext())
+                                                routeRecycler.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+                                            } else {
+                                                routeAdapter!!.setData(p1, RouteAdapter.RouteType.Drive)
+                                            }
+                                            routeDivider.visibility = View.VISIBLE
+                                            routeRecycler.visibility = View.VISIBLE
                                         }
-                                        routeDivider.visibility = View.VISIBLE
-                                        routeRecycler.visibility = View.VISIBLE
                                     }
-                                }
-                                override fun onFailure(p0: Int, p1: String?, p2: Throwable?) {
-                                    routeDivider.visibility = View.GONE
-                                    routeRecycler.visibility = View.GONE
-                                }
-                            })
-                        }
-                        R.id.sheet_route_transit_button -> { // Transit
-                            val transitParam = TransitParam().apply{
-                                from(LatLng(currentLocation.latitude, currentLocation.longitude))
-                                to(LatLng(SearchActivity.resultList[position].location.lat, SearchActivity.resultList[position].location.lng))
+                                    override fun onFailure(p0: Int, p1: String?, p2: Throwable?) {
+                                        routeDivider.visibility = View.GONE
+                                        routeRecycler.visibility = View.GONE
+                                    }
+                                })
                             }
-                            TencentSearch(requireContext()).getRoutePlan(transitParam, object: HttpResponseListener<TransitResultObject> {
-                                override fun onSuccess(p0: Int, p1: TransitResultObject?) {
-                                    if (p1 != null) {
-                                        if (routeAdapter == null) {
-                                            routeAdapter = RouteAdapter(p1, RouteAdapter.RouteType.Transit, requireContext())
-                                            routeRecycler.adapter = routeAdapter
-                                            routeRecycler.layoutManager = LinearLayoutManager(requireContext())
-                                            routeRecycler.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-                                        } else {
-                                            routeAdapter!!.setData(p1, RouteAdapter.RouteType.Transit)
+                            R.id.sheet_route_walk_button -> { // Walk
+                                val walkingParam = WalkingParam().apply{
+                                    from(LatLng(currentLocation.latitude, currentLocation.longitude))
+                                    to(LatLng(SearchActivity.resultList[position].location.lat, SearchActivity.resultList[position].location.lng))
+                                }
+                                TencentSearch(requireContext()).getRoutePlan(walkingParam, object: HttpResponseListener<WalkingResultObject> {
+                                    override fun onSuccess(p0: Int, p1: WalkingResultObject?) {
+                                        if (p1 != null) {
+                                            if (routeAdapter == null) {
+                                                routeAdapter = RouteAdapter(p1, RouteAdapter.RouteType.Walk, requireContext())
+                                                routeRecycler.adapter = routeAdapter
+                                                routeRecycler.layoutManager = LinearLayoutManager(requireContext())
+                                                routeRecycler.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+                                            } else {
+                                                routeAdapter!!.setData(p1, RouteAdapter.RouteType.Walk)
+                                            }
+                                            routeDivider.visibility = View.VISIBLE
+                                            routeRecycler.visibility = View.VISIBLE
                                         }
-                                        routeDivider.visibility = View.VISIBLE
-                                        routeRecycler.visibility = View.VISIBLE
                                     }
-                                }
-                                override fun onFailure(p0: Int, p1: String?, p2: Throwable?) {
-                                    routeDivider.visibility = View.GONE
-                                    routeRecycler.visibility = View.GONE
-                                }
-                            })
-                        }
-                        R.id.sheet_route_bicycle_button -> { // Bicycle
-                            val bicycleParam = BicyclingParam().apply{
-                                from(LatLng(currentLocation.latitude, currentLocation.longitude))
-                                to(LatLng(SearchActivity.resultList[position].location.lat, SearchActivity.resultList[position].location.lng))
+                                    override fun onFailure(p0: Int, p1: String?, p2: Throwable?) {
+                                        routeDivider.visibility = View.GONE
+                                        routeRecycler.visibility = View.GONE
+                                    }
+                                })
                             }
-                            TencentSearch(requireContext()).getRoutePlan(bicycleParam, object: HttpResponseListener<BicyclingResultObject> {
-                                override fun onSuccess(p0: Int, p1: BicyclingResultObject?) {
-                                    if (p1 != null) {
-                                        if (routeAdapter == null) {
-                                            routeAdapter = RouteAdapter(p1, RouteAdapter.RouteType.Transit, requireContext())
-                                            routeRecycler.adapter = routeAdapter
-                                            routeRecycler.layoutManager = LinearLayoutManager(requireContext())
-                                            routeRecycler.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-                                        } else {
-                                            routeAdapter!!.setData(p1, RouteAdapter.RouteType.Bicycle)
+                            R.id.sheet_route_transit_button -> { // Transit
+                                val transitParam = TransitParam().apply{
+                                    from(LatLng(currentLocation.latitude, currentLocation.longitude))
+                                    to(LatLng(SearchActivity.resultList[position].location.lat, SearchActivity.resultList[position].location.lng))
+                                }
+                                TencentSearch(requireContext()).getRoutePlan(transitParam, object: HttpResponseListener<TransitResultObject> {
+                                    override fun onSuccess(p0: Int, p1: TransitResultObject?) {
+                                        if (p1 != null) {
+                                            if (routeAdapter == null) {
+                                                routeAdapter = RouteAdapter(p1, RouteAdapter.RouteType.Transit, requireContext())
+                                                routeRecycler.adapter = routeAdapter
+                                                routeRecycler.layoutManager = LinearLayoutManager(requireContext())
+                                                routeRecycler.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+                                            } else {
+                                                routeAdapter!!.setData(p1, RouteAdapter.RouteType.Transit)
+                                            }
+                                            routeDivider.visibility = View.VISIBLE
+                                            routeRecycler.visibility = View.VISIBLE
                                         }
-                                        routeDivider.visibility = View.VISIBLE
-                                        routeRecycler.visibility = View.VISIBLE
                                     }
+                                    override fun onFailure(p0: Int, p1: String?, p2: Throwable?) {
+                                        routeDivider.visibility = View.GONE
+                                        routeRecycler.visibility = View.GONE
+                                    }
+                                })
+                            }
+                            R.id.sheet_route_bicycle_button -> { // Bicycle
+                                val bicycleParam = BicyclingParam().apply{
+                                    from(LatLng(currentLocation.latitude, currentLocation.longitude))
+                                    to(LatLng(SearchActivity.resultList[position].location.lat, SearchActivity.resultList[position].location.lng))
                                 }
-                                override fun onFailure(p0: Int, p1: String?, p2: Throwable?) {
-                                    routeDivider.visibility = View.GONE
-                                    routeRecycler.visibility = View.GONE
-                                }
-                            })
+                                TencentSearch(requireContext()).getRoutePlan(bicycleParam, object: HttpResponseListener<BicyclingResultObject> {
+                                    override fun onSuccess(p0: Int, p1: BicyclingResultObject?) {
+                                        if (p1 != null) {
+                                            if (routeAdapter == null) {
+                                                routeAdapter = RouteAdapter(p1, RouteAdapter.RouteType.Transit, requireContext())
+                                                routeRecycler.adapter = routeAdapter
+                                                routeRecycler.layoutManager = LinearLayoutManager(requireContext())
+                                                routeRecycler.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+                                            } else {
+                                                routeAdapter!!.setData(p1, RouteAdapter.RouteType.Bicycle)
+                                            }
+                                            routeDivider.visibility = View.VISIBLE
+                                            routeRecycler.visibility = View.VISIBLE
+                                        }
+                                    }
+                                    override fun onFailure(p0: Int, p1: String?, p2: Throwable?) {
+                                        routeDivider.visibility = View.GONE
+                                        routeRecycler.visibility = View.GONE
+                                    }
+                                })
+                            }
                         }
+                    } else {
+                        Toast.makeText(requireContext(), R.string.toast_wait_for_location, Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -279,6 +285,7 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         aroundButton = root.findViewById(R.id.around_button)
 
         sheetLayout = root.findViewById(R.id.search_result_sheet)
+        sheetCloseButton = root.findViewById(R.id.sheet_close_button)
         sheetContent = root.findViewById(R.id.search_result_sheet_layout)
         sheetContentBehavior = BottomSheetBehavior.from(sheetContent)
         sheetTitleText = root.findViewById(R.id.sheet_title_text)
@@ -336,6 +343,13 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         if (!openingSearch)
             mapView.onPause()
         targetMarker?.remove()
+
+        // 自动隐藏已有路线
+        arrayOf(sheetRouteDriveButton, sheetRouteWalkButton, sheetRouteTransitButton, sheetRouteBicycleButton).forEach {
+            it.background = ResourcesCompat.getDrawable(resources, android.R.color.transparent, requireActivity().theme)
+        }
+        routeRecycler.visibility = View.GONE
+        routeDivider.visibility = View.GONE
     }
 
     override fun onStop() {
