@@ -11,6 +11,7 @@ import com.huawei.hms.mlsdk.sounddect.MLSoundDectConstants
 import com.huawei.hms.mlsdk.sounddect.MLSoundDectListener
 import com.huawei.hms.mlsdk.sounddect.MLSoundDector
 import com.zzp.dtrip.activity.SoundActivity
+import com.zzp.dtrip.fragment.MineFragment
 
 class SoundService : Service() {
 
@@ -106,7 +107,7 @@ class SoundService : Service() {
                     val intent = Intent("com.zzp.SOUND_EVENT_TYPE_CAR_ALARM")
                     intent.setPackage(packageName);
                     sendBroadcast(intent)
-                    if (!SoundActivity.swichFlag) {
+                    if (!MineFragment.switchFlag) {
                         Toast.makeText(this@SoundService,"捕捉到汽车喇叭声", Toast.LENGTH_SHORT).show()
                         playVibrate(1800, 200, true)
                         isVibrate = true
@@ -118,7 +119,7 @@ class SoundService : Service() {
                     val intent = Intent("com.zzp.SOUND_EVENT_TYPE_DOOR_BELL")
                     intent.setPackage(packageName);
                     sendBroadcast(intent)
-                    if (SoundActivity.swichFlag) {
+                    if (MineFragment.switchFlag) {
                         playVibrate(1500, 500, true)
                         Toast.makeText(this@SoundService,"捕捉到门铃声", Toast.LENGTH_SHORT).show()
                         isVibrate = true
@@ -130,7 +131,7 @@ class SoundService : Service() {
                     val intent = Intent("com.zzp.SOUND_EVENT_TYPE_KNOCK")
                     intent.setPackage(packageName);
                     sendBroadcast(intent)
-                    if (SoundActivity.swichFlag) {
+                    if (MineFragment.switchFlag) {
                         playVibrate(1500, 500, true)
                         Toast.makeText(this@SoundService,"捕捉到敲门声", Toast.LENGTH_SHORT).show()
                         isVibrate = true

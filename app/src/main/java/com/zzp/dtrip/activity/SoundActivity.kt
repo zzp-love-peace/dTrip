@@ -14,6 +14,7 @@ import androidx.core.app.ActivityCompat
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.zzp.dtrip.R
+import com.zzp.dtrip.fragment.MineFragment
 import com.zzp.dtrip.service.SoundService
 
 import java.util.*
@@ -27,10 +28,6 @@ class SoundActivity : AppCompatActivity() {
     private lateinit var myReceiver: BroadcastReceiver
 
     private lateinit var notifyText: TextView
-
-    private lateinit var switchMaterial: SwitchMaterial
-
-    private lateinit var prefs: SharedPreferences
 
     private val connection =  object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
@@ -49,9 +46,7 @@ class SoundActivity : AppCompatActivity() {
     private val perms = arrayOf(Manifest.permission.RECORD_AUDIO)
     private val RC_RECORD_CODE = 0x123
 
-    companion object {
-        var swichFlag = false
-    }
+
 
     private val TAG = "SoundActivity"
 
@@ -62,17 +57,12 @@ class SoundActivity : AppCompatActivity() {
         bindService()
         startService()
         doRegisterReceiver()
-        initPrefAndSwitch()
         initButtonAndText()
 
         stopButton.setOnClickListener {
             myBinder.stopVibrate()
             stopButton.visibility = View.GONE
 
-        }
-
-        switchMaterial.setOnCheckedChangeListener { buttonView, isChecked ->
-            swichFlag = isChecked
         }
 
         floatButton.setOnClickListener {
@@ -100,7 +90,6 @@ class SoundActivity : AppCompatActivity() {
         stopButton = findViewById(R.id.stop_button)
         floatButton = findViewById(R.id.floating_Button)
         notifyText = findViewById(R.id.notify_text)
-        switchMaterial = findViewById(R.id.switch_material)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray) {
@@ -149,18 +138,6 @@ class SoundActivity : AppCompatActivity() {
         registerReceiver(myReceiver, intentFilter)
     }
 
-    private fun initPrefAndSwitch() {
-        prefs = getPreferences(Context.MODE_PRIVATE)
-        swichFlag = prefs.getBoolean("switch", false)
-        switchMaterial.isChecked = swichFlag
-        Log.d(TAG, "initPrefAndSwitch: ")
-    }
-
-    private fun saveSwitchFlag() {
-        val edit = prefs.edit()
-        edit.putBoolean("switch", swichFlag)
-        edit.apply()
-    }
 
     inner class MyBroadcastReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -193,7 +170,7 @@ class SoundActivity : AppCompatActivity() {
                 }
                 "com.zzp.SOUND_EVENT_TYPE_CAR_ALARM" -> {
                     stopButton.visibility = View.VISIBLE
-                    if (swichFlag) {
+                    if (MineFragment.switchFlag) {
                         notifyText.setTextColor(resources.getColor(R.color.black))
                     }
                     else {
@@ -201,7 +178,7 @@ class SoundActivity : AppCompatActivity() {
                     }
                 }
                 "com.zzp.SOUND_EVENT_TYPE_DOOR_BELL" -> {
-                    if (swichFlag) {
+                    if (MineFragment.switchFlag) {
                         stopButton.visibility = View.VISIBLE
                         notifyText.setTextColor(resources.getColor(R.color.red))
                     }
@@ -210,7 +187,7 @@ class SoundActivity : AppCompatActivity() {
                     }
                 }
                 "com.zzp.SOUND_EVENT_TYPE_KNOCK" -> {
-                    if (swichFlag) {
+                    if (MineFragment.switchFlag) {
                         stopButton.visibility = View.VISIBLE
                         notifyText.setTextColor(resources.getColor(R.color.red))
                     }
@@ -230,10 +207,5 @@ class SoundActivity : AppCompatActivity() {
             notifyText.text = SoundService.text
         }
 
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        saveSwitchFlag()
     }
 }

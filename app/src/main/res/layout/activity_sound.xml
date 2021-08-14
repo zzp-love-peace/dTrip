@@ -17,7 +17,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.7"
+        app:layout_constraintVertical_bias="0.79"
         app:maxImageSize="58dp"
         app:tint="@color/white" />
 
@@ -35,7 +35,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.85"
+        app:layout_constraintVertical_bias="0.50"
         app:strokeColor="@color/red"
         app:strokeWidth="2dp" />
 
@@ -52,17 +52,4 @@
         app:layout_constraintVertical_bias="0.2"
         android:text="声音报警系统" />
 
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/switch_material"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="居家模式"
-        android:textSize="16sp"
-
-        app:switchPadding="10dp"
-        app:switchMinWidth="60dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
