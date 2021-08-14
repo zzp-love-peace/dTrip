@@ -10,4 +10,5 @@
     <string name="duration_hours_with_minutes">%d 小时 %d 分</string>
     <string name="distance_meters">%d 米</string>
     <string name="distance_kilometers">%d 千米</string>
+    <string name="toast_wait_for_location">请等待定位</string>
 </resources>
