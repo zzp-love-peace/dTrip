@@ -40,6 +40,7 @@ import com.tencent.tencentmap.mapsdk.maps.LocationSource.OnLocationChangedListen
 import com.tencent.tencentmap.mapsdk.maps.model.*
 import com.tencent.tencentmap.mapsdk.maps.model.MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER
 import com.zzp.dtrip.R
+import com.zzp.dtrip.activity.NearbyActivity
 import com.zzp.dtrip.activity.SearchActivity
 import com.zzp.dtrip.activity.SocialActivity
 import com.zzp.dtrip.activity.SoundActivity
@@ -148,7 +149,10 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
             val intent = Intent(requireContext(), SoundActivity::class.java)
             startActivity(intent)
         }
-        aroundButton.setOnClickListener {  }
+        aroundButton.setOnClickListener {
+            val intent = Intent(requireContext(), NearbyActivity::class.java)
+            startActivity(intent)
+        }
 
         // 选择交通方式
         // TODO: 实现选中路线、绘制道路
