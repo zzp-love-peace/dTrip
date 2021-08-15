@@ -13,4 +13,6 @@
     <color name="color_float">#61A3E4C8</color>
     <color name="red">#E9E8093D</color>
     <color name="gray_shallow">#3333</color>
+    
+    <color name="light_blue_100">#b3e5fc</color>
 </resources>

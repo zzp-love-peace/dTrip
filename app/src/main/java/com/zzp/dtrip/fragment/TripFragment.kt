@@ -2,17 +2,19 @@ package com.zzp.dtrip.fragment
 
 import android.Manifest
 import android.app.ActivityOptions
+import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.TransitionDrawable
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.RequiresApi
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
@@ -26,27 +28,22 @@ import com.tencent.lbssearch.`object`.param.BicyclingParam
 import com.tencent.lbssearch.`object`.param.DrivingParam
 import com.tencent.lbssearch.`object`.param.TransitParam
 import com.tencent.lbssearch.`object`.param.WalkingParam
-import com.tencent.lbssearch.`object`.result.BicyclingResultObject
-import com.tencent.lbssearch.`object`.result.DrivingResultObject
-import com.tencent.lbssearch.`object`.result.TransitResultObject
-import com.tencent.lbssearch.`object`.result.WalkingResultObject
+import com.tencent.lbssearch.`object`.result.*
 import com.tencent.map.geolocation.TencentLocation
 import com.tencent.map.geolocation.TencentLocationListener
 import com.tencent.map.geolocation.TencentLocationManager
 import com.tencent.map.geolocation.TencentLocationRequest
+import com.tencent.map.tools.json.JsonComposer
 import com.tencent.map.tools.net.http.HttpResponseListener
 import com.tencent.tencentmap.mapsdk.maps.*
 import com.tencent.tencentmap.mapsdk.maps.LocationSource.OnLocationChangedListener
-import com.tencent.tencentmap.mapsdk.maps.model.LatLng
-import com.tencent.tencentmap.mapsdk.maps.model.Marker
-import com.tencent.tencentmap.mapsdk.maps.model.MarkerOptions
-import com.tencent.tencentmap.mapsdk.maps.model.MyLocationStyle
+import com.tencent.tencentmap.mapsdk.maps.model.*
 import com.tencent.tencentmap.mapsdk.maps.model.MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER
 import com.zzp.dtrip.R
 import com.zzp.dtrip.activity.SearchActivity
 import com.zzp.dtrip.activity.SocialActivity
 import com.zzp.dtrip.activity.SoundActivity
-import com.zzp.dtrip.adapter.RouteAdapter
+import com.zzp.dtrip.util.MetricUtil
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
 
@@ -97,6 +94,15 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
     private lateinit var routeDivider: View
     private lateinit var routeRecycler: RecyclerView
     private var routeAdapter: RouteAdapter? = null
+    // 路线存储
+    enum class RouteType {Drive, Walk, Transit, Bicycle}
+    private data class RouteResult (val resultObject: RoutePlanningObject, val type: RouteType)
+    data class Route (val route: JsonComposer, val type: RouteType)
+    private var routeResult: RouteResult? = null
+    private var currentRoute: Route? = null
+    private var currentRouteSelected = -1
+    private var currentPolylinePointSet: List<LatLng>? = null
+    private var currentPolyline: Polyline? = null
 
     private var locationChangedListener: OnLocationChangedListener? = null
 
@@ -147,12 +153,18 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         // 选择交通方式
         // TODO: 实现选中路线、绘制道路
         sheetCloseButton.setOnClickListener {
+            resetPolylineAndRouteSelection()
             sheetContentBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            if(::currentLocation.isInitialized)
+                tencentMap.animateCamera(CameraUpdateFactory.newLatLng(LatLng(currentLocation.latitude, currentLocation.longitude)))
         }
         arrayOf(sheetRouteDriveButton, sheetRouteWalkButton, sheetRouteTransitButton, sheetRouteBicycleButton).let { array ->
             array.forEach { button ->
                 button.setOnClickListener { _ ->
                     if (::currentLocation.isInitialized) {
+                        // reset selected state for routes
+                        resetPolylineAndRouteSelection()
+                        // change background for buttons
                         array.forEach {
                             it.background = ResourcesCompat.getDrawable(resources, if (button.id == it.id) R.drawable.background_transportation else android.R.color.transparent, requireActivity().theme)
                         }
@@ -166,21 +178,12 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
                                 TencentSearch(requireContext()).getRoutePlan(drivingParam, object: HttpResponseListener<DrivingResultObject> {
                                     override fun onSuccess(p0: Int, p1: DrivingResultObject?) {
                                         if (p1 != null) {
-                                            if (routeAdapter == null) {
-                                                routeAdapter = RouteAdapter(p1, RouteAdapter.RouteType.Drive, requireContext())
-                                                routeRecycler.adapter = routeAdapter
-                                                routeRecycler.layoutManager = LinearLayoutManager(requireContext())
-                                                routeRecycler.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-                                            } else {
-                                                routeAdapter!!.setData(p1, RouteAdapter.RouteType.Drive)
-                                            }
-                                            routeDivider.visibility = View.VISIBLE
-                                            routeRecycler.visibility = View.VISIBLE
+                                            routeResult = RouteResult(p1, RouteType.Drive)
+                                            notifyRecyclerUpdate()
                                         }
                                     }
                                     override fun onFailure(p0: Int, p1: String?, p2: Throwable?) {
-                                        routeDivider.visibility = View.GONE
-                                        routeRecycler.visibility = View.GONE
+                                        Toast.makeText(requireContext(), "Error: $p1", Toast.LENGTH_SHORT).show()
                                     }
                                 })
                             }
@@ -192,21 +195,12 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
                                 TencentSearch(requireContext()).getRoutePlan(walkingParam, object: HttpResponseListener<WalkingResultObject> {
                                     override fun onSuccess(p0: Int, p1: WalkingResultObject?) {
                                         if (p1 != null) {
-                                            if (routeAdapter == null) {
-                                                routeAdapter = RouteAdapter(p1, RouteAdapter.RouteType.Walk, requireContext())
-                                                routeRecycler.adapter = routeAdapter
-                                                routeRecycler.layoutManager = LinearLayoutManager(requireContext())
-                                                routeRecycler.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-                                            } else {
-                                                routeAdapter!!.setData(p1, RouteAdapter.RouteType.Walk)
-                                            }
-                                            routeDivider.visibility = View.VISIBLE
-                                            routeRecycler.visibility = View.VISIBLE
+                                            routeResult = RouteResult(p1, RouteType.Walk)
+                                            notifyRecyclerUpdate()
                                         }
                                     }
                                     override fun onFailure(p0: Int, p1: String?, p2: Throwable?) {
-                                        routeDivider.visibility = View.GONE
-                                        routeRecycler.visibility = View.GONE
+                                        Toast.makeText(requireContext(), "Error: $p1", Toast.LENGTH_SHORT).show()
                                     }
                                 })
                             }
@@ -218,21 +212,12 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
                                 TencentSearch(requireContext()).getRoutePlan(transitParam, object: HttpResponseListener<TransitResultObject> {
                                     override fun onSuccess(p0: Int, p1: TransitResultObject?) {
                                         if (p1 != null) {
-                                            if (routeAdapter == null) {
-                                                routeAdapter = RouteAdapter(p1, RouteAdapter.RouteType.Transit, requireContext())
-                                                routeRecycler.adapter = routeAdapter
-                                                routeRecycler.layoutManager = LinearLayoutManager(requireContext())
-                                                routeRecycler.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-                                            } else {
-                                                routeAdapter!!.setData(p1, RouteAdapter.RouteType.Transit)
-                                            }
-                                            routeDivider.visibility = View.VISIBLE
-                                            routeRecycler.visibility = View.VISIBLE
+                                            routeResult = RouteResult(p1, RouteType.Transit)
+                                            notifyRecyclerUpdate()
                                         }
                                     }
                                     override fun onFailure(p0: Int, p1: String?, p2: Throwable?) {
-                                        routeDivider.visibility = View.GONE
-                                        routeRecycler.visibility = View.GONE
+                                        Toast.makeText(requireContext(), "Error: $p1", Toast.LENGTH_SHORT).show()
                                     }
                                 })
                             }
@@ -244,21 +229,12 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
                                 TencentSearch(requireContext()).getRoutePlan(bicycleParam, object: HttpResponseListener<BicyclingResultObject> {
                                     override fun onSuccess(p0: Int, p1: BicyclingResultObject?) {
                                         if (p1 != null) {
-                                            if (routeAdapter == null) {
-                                                routeAdapter = RouteAdapter(p1, RouteAdapter.RouteType.Transit, requireContext())
-                                                routeRecycler.adapter = routeAdapter
-                                                routeRecycler.layoutManager = LinearLayoutManager(requireContext())
-                                                routeRecycler.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-                                            } else {
-                                                routeAdapter!!.setData(p1, RouteAdapter.RouteType.Bicycle)
-                                            }
-                                            routeDivider.visibility = View.VISIBLE
-                                            routeRecycler.visibility = View.VISIBLE
+                                            routeResult = RouteResult(p1, RouteType.Bicycle)
+                                            notifyRecyclerUpdate()
                                         }
                                     }
                                     override fun onFailure(p0: Int, p1: String?, p2: Throwable?) {
-                                        routeDivider.visibility = View.GONE
-                                        routeRecycler.visibility = View.GONE
+                                        Toast.makeText(requireContext(), "Error: $p1", Toast.LENGTH_SHORT).show()
                                     }
                                 })
                             }
@@ -347,6 +323,7 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         arrayOf(sheetRouteDriveButton, sheetRouteWalkButton, sheetRouteTransitButton, sheetRouteBicycleButton).forEach {
             it.background = ResourcesCompat.getDrawable(resources, android.R.color.transparent, requireActivity().theme)
         }
+        resetPolylineAndRouteSelection()
         routeRecycler.visibility = View.GONE
         routeDivider.visibility = View.GONE
     }
@@ -490,6 +467,147 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         locationRequest.requestLevel = TencentLocationRequest. REQUEST_LEVEL_ADMIN_AREA
         locationRequest.isAllowDirection = true
         locationRequest.isIndoorLocationMode = true
+    }
+
+    private fun notifyRecyclerUpdate() {
+        if (routeResult != null) {
+            if (routeAdapter == null) {
+                routeAdapter = RouteAdapter(routeResult!!.resultObject, routeResult!!.type, requireContext())
+                routeRecycler.apply {
+                    adapter = routeAdapter
+                    layoutManager = LinearLayoutManager(requireContext())
+                    addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+                }
+            } else {
+                routeAdapter!!.setData(routeResult!!.resultObject, routeResult!!.type)
+            }
+            routeAdapter?.notifyDataSetChanged()
+            routeDivider.visibility = View.VISIBLE
+            routeRecycler.visibility = View.VISIBLE
+        } else {
+            routeDivider.visibility = View.GONE
+            routeRecycler.visibility = View.GONE
+        }
+    }
+
+    private fun resetPolylineAndRouteSelection(){
+        currentRoute = null
+        currentRouteSelected = -1
+        currentPolyline?.remove()
+        currentPolyline = null
+        routeAdapter?.notifyDataSetChanged()
+    }
+
+    inner class RouteAdapter(private var result: RoutePlanningObject, private var type: RouteType, private val context: Context): RecyclerView.Adapter<RouteAdapter.RouteHolder>() {
+
+        inner class RouteHolder(item: View): RecyclerView.ViewHolder(item) {
+            val layout = item.findViewById<ConstraintLayout>(R.id.route_layout)
+            val layoutBackgroundTransition = layout.background as TransitionDrawable
+            var transitionFinished = false
+            val durationText = item.findViewById<TextView>(R.id.route_duration)
+            val distanceText = item.findViewById<TextView>(R.id.route_distance)
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RouteHolder = RouteHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_route, parent, false))
+
+        override fun onBindViewHolder(holder: RouteHolder, position: Int) {
+            // TODO: 在 distanceText 上展示不同（主要是公交）线路的具体步骤
+            when (type) {
+                RouteType.Drive ->
+                    (result as DrivingResultObject).result.routes.let {
+                        holder.durationText.text = MetricUtil.convertMinutesToTimeString(it[position].duration.toLong(), context)
+                        holder.distanceText.text = MetricUtil.convertMetersToDistanceString(it[position].distance, context)
+                    }
+                RouteType.Walk ->
+                    (result as WalkingResultObject).result.routes.let {
+                        holder.durationText.text = MetricUtil.convertMinutesToTimeString(it[position].duration.toLong(), context)
+                        holder.distanceText.text = MetricUtil.convertMetersToDistanceString(it[position].distance, context)
+                    }
+                RouteType.Transit ->
+                    (result as TransitResultObject).result.routes.let {
+                        holder.durationText.text = MetricUtil.convertMinutesToTimeString(it[position].duration, context)
+                        holder.distanceText.text = MetricUtil.convertMetersToDistanceString(it[position].distance, context)
+                    }
+                RouteType.Bicycle ->
+                    (result as BicyclingResultObject).result.routes.let {
+                        holder.durationText.text = MetricUtil.convertMinutesToTimeString(it[position].duration.toLong(), context)
+                        holder.distanceText.text = MetricUtil.convertMetersToDistanceString(it[position].distance, context)
+                    }
+            }
+            holder.layout.setOnClickListener {
+                if (currentRouteSelected != holder.adapterPosition) {
+                    val previousPosition = currentRouteSelected
+                    currentRouteSelected = holder.adapterPosition
+                    notifyItemChanged(previousPosition)
+                    notifyItemChanged(holder.adapterPosition)
+                    if (currentPolyline != null)
+                        currentPolyline!!.remove()
+                    // 根据类型不同，应用、合并不同线路
+                    currentRoute = Route(when (type) {
+                        RouteType.Drive ->
+                            (result as DrivingResultObject).result.routes[holder.adapterPosition].also {
+                                currentPolylinePointSet = it.polyline
+                            }
+                        RouteType.Walk ->
+                            (result as WalkingResultObject).result.routes[holder.adapterPosition].also {
+                                currentPolylinePointSet = it.polyline
+                            }
+                        RouteType.Transit ->
+                            (result as TransitResultObject).result.routes[holder.adapterPosition].also {
+                                val resultPointSet = mutableListOf<LatLng>()
+                                it.steps.forEach { step ->
+                                    when(step.mode) {
+                                        "WALKING" -> {
+                                            resultPointSet.addAll((step as TransitResultObject.Walking).polyline)
+                                        }
+                                        "TRANSIT" -> {
+                                            (step as TransitResultObject.Transit).lines.forEach { line ->
+                                                resultPointSet.addAll(line.polyline)
+                                            }
+                                        }
+                                    }
+                                }
+                                currentPolylinePointSet = resultPointSet
+                            }
+                        RouteType.Bicycle ->
+                            (result as BicyclingResultObject).result.routes[holder.adapterPosition].also {
+                                currentPolylinePointSet = it.polyline
+                            }
+                    }, type)
+                    // 绘制折线并移动相机
+                    currentPolyline = tencentMap.addPolyline(PolylineOptions().apply {
+                        addAll(currentPolylinePointSet)
+                        lineCap(true)
+                        color(ResourcesCompat.getColor(resources, R.color.purple_500, requireActivity().theme))
+                        width(10F)
+                    })
+                    tencentMap.animateCamera(CameraUpdateFactory.newLatLngBounds(LatLngBounds.builder().include(currentPolyline!!.points).build(), 100))
+                }
+            }
+            if (currentRouteSelected == position && !holder.transitionFinished) {
+                holder.layoutBackgroundTransition.startTransition(100)
+                holder.transitionFinished = true
+            } else if (currentRouteSelected != position && holder.transitionFinished) {
+                holder.layoutBackgroundTransition.reverseTransition(100)
+                holder.transitionFinished = false
+            }
+        }
+
+        override fun getItemCount(): Int = when (type) {
+            RouteType.Drive ->
+                (result as DrivingResultObject).result.routes.size
+            RouteType.Walk ->
+                (result as WalkingResultObject).result.routes.size
+            RouteType.Transit ->
+                (result as TransitResultObject).result.routes.size
+            RouteType.Bicycle ->
+                (result as BicyclingResultObject).result.routes.size
+        }
+
+        fun setData (result: RoutePlanningObject, type: RouteType) {
+            this@RouteAdapter.result = result
+            this@RouteAdapter.type = type
+        }
     }
 }
 
