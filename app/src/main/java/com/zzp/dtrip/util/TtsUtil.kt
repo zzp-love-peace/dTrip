@@ -23,7 +23,7 @@ object TtsUtil {
     private val DEFAULT_VOLUME = 50
 
     /**
-     * Do not edit these if you don't know what they are
+     * 华为身份认证配置，请不要随意修改
      */
     private val ak = "UUGGCX3AW5VDFHTBEM0P"
     private val sk = "Lkfb2IswOB9nKfHqHVjnfDVrYx8Ey8b5ePL4MEp5"

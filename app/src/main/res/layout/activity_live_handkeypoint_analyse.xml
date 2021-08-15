@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+<com.zzp.dtrip.view.LensEnginePreview
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/hand_preview"
+    />
+
+
+    <com.zzp.dtrip.view.GraphicOverlay
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/hand_overlay"
+        />
+
+
+    <Button
+        android:id="@+id/hand_switch"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:background="@drawable/front_back_switch"
+        app:layout_constraintBottom_toBottomOf="@+id/hand_preview"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

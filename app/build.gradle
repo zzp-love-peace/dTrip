@@ -87,4 +87,10 @@ dependencies {
     // 引入声音识别集合包
     implementation 'com.huawei.hms:ml-speech-semantics-sounddect-sdk:2.1.0.300'
     implementation 'com.huawei.hms:ml-speech-semantics-sounddect-model:2.1.0.300'
+    // 引入手部关键点检测模型包
+    implementation 'com.huawei.hms:ml-computer-vision-handkeypoint-model:2.1.0.300'
+    // 引入手势识别模型包
+    implementation 'com.huawei.hms:ml-computer-vision-gesture-model:2.1.0.300'
+    // 引入基础SDK
+    implementation 'com.huawei.hms:ml-computer-vision-handkeypoint:2.1.0.300'
 }
