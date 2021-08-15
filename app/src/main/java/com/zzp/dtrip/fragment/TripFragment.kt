@@ -12,6 +12,8 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -40,6 +42,7 @@ import com.tencent.tencentmap.mapsdk.maps.LocationSource.OnLocationChangedListen
 import com.tencent.tencentmap.mapsdk.maps.model.*
 import com.tencent.tencentmap.mapsdk.maps.model.MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER
 import com.zzp.dtrip.R
+import com.zzp.dtrip.activity.NearbyActivity
 import com.zzp.dtrip.activity.SearchActivity
 import com.zzp.dtrip.activity.SocialActivity
 import com.zzp.dtrip.activity.SoundActivity
@@ -82,7 +85,10 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
     private lateinit var sheetContentBehavior: BottomSheetBehavior<LinearLayout>
     private lateinit var sheetTitleText: TextView
     private lateinit var sheetAddressText: TextView
+    // FAB 及动画
     private lateinit var sheetRouteButton: FloatingActionButton
+    private lateinit var sheetRouteButtonShowAnim: Animation
+    private lateinit var sheetRouteButtonHideAnim: Animation
     // 四个交通方式按钮
     private lateinit var sheetRouteDriveButton: ImageButton
     private lateinit var sheetRouteWalkButton: ImageButton
@@ -148,10 +154,12 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
             val intent = Intent(requireContext(), SoundActivity::class.java)
             startActivity(intent)
         }
-        aroundButton.setOnClickListener {  }
+        aroundButton.setOnClickListener {
+            val intent = Intent(requireContext(), NearbyActivity::class.java)
+            startActivity(intent)
+        }
 
         // 选择交通方式
-        // TODO: 实现选中路线、绘制道路
         sheetCloseButton.setOnClickListener {
             resetPolylineAndRouteSelection()
             sheetContentBehavior.state = BottomSheetBehavior.STATE_HIDDEN
@@ -248,7 +256,7 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
 
         // FAB 事件：出发
         sheetRouteButton.setOnClickListener {
-
+            Toast.makeText(requireContext(), "这里应该会有一个导航", Toast.LENGTH_SHORT).show()
         }
         return root
     }
@@ -266,7 +274,24 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         sheetContentBehavior = BottomSheetBehavior.from(sheetContent)
         sheetTitleText = root.findViewById(R.id.sheet_title_text)
         sheetAddressText = root.findViewById(R.id.sheet_address_text)
+        sheetRouteButtonShowAnim = AnimationUtils.loadAnimation(requireContext(), R.anim.sheet_fab_show)
+        sheetRouteButtonHideAnim = AnimationUtils.loadAnimation(requireContext(), R.anim.sheet_fab_hide)
         sheetRouteButton = root.findViewById(R.id.sheet_route_button)
+        // 自动隐藏、显示
+        sheetRouteButtonShowAnim.setAnimationListener(object: Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation?) {
+                sheetRouteButton.visibility = View.VISIBLE
+            }
+            override fun onAnimationEnd(animation: Animation?) {}
+            override fun onAnimationRepeat(animation: Animation?) {}
+        })
+        sheetRouteButtonHideAnim.setAnimationListener(object: Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation?) {}
+            override fun onAnimationEnd(animation: Animation?) {
+                sheetRouteButton.visibility = View.GONE
+            }
+            override fun onAnimationRepeat(animation: Animation?) {}
+        })
 
         sheetRouteDriveButton = root.findViewById(R.id.sheet_route_drive_button)
         sheetRouteWalkButton = root.findViewById(R.id.sheet_route_walk_button)
@@ -491,6 +516,8 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
     }
 
     private fun resetPolylineAndRouteSelection(){
+        if (sheetRouteButton.visibility == View.VISIBLE)
+            sheetRouteButton.startAnimation(sheetRouteButtonHideAnim)
         currentRoute = null
         currentRouteSelected = -1
         currentPolyline?.remove()
@@ -525,8 +552,26 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
                     }
                 RouteType.Transit ->
                     (result as TransitResultObject).result.routes.let {
+                        val partsToBeAppended = mutableListOf<String>()
+                        it[position].steps.forEach { step ->
+                            when (step.mode) {
+                                "WALKING" ->
+                                    partsToBeAppended.add(getString(R.string.distance_transit_walk, (step as TransitResultObject.Walking).duration.toInt()))
+                                "TRANSIT" ->
+                                    (step as TransitResultObject.Transit).lines.forEach { line ->
+                                        when (line.vehicle) {
+                                            "RAIL" ->
+                                                partsToBeAppended.add(getString(R.string.distance_transit_rail, line.title))
+                                            "BUS" ->
+                                                partsToBeAppended.add(getString(R.string.distance_transit_bus, line.title))
+                                            "SUBWAY" ->
+                                                partsToBeAppended.add(getString(R.string.distance_transit_subway, line.title))
+                                        }
+                                    }
+                            }
+                        }
                         holder.durationText.text = MetricUtil.convertMinutesToTimeString(it[position].duration, context)
-                        holder.distanceText.text = MetricUtil.convertMetersToDistanceString(it[position].distance, context)
+                        holder.distanceText.text = partsToBeAppended.joinToString(" > ")
                     }
                 RouteType.Bicycle ->
                     (result as BicyclingResultObject).result.routes.let {
@@ -582,6 +627,9 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
                         width(10F)
                     })
                     tencentMap.animateCamera(CameraUpdateFactory.newLatLngBounds(LatLngBounds.builder().include(currentPolyline!!.points).build(), 100))
+                    // 显示 FAB
+                    if (sheetRouteButton.visibility == View.GONE)
+                        sheetRouteButton.startAnimation(sheetRouteButtonShowAnim)
                 }
             }
             if (currentRouteSelected == position && !holder.transitionFinished) {

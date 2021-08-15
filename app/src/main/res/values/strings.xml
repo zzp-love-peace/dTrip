@@ -2,7 +2,6 @@
     <string name="app_name">dTrip</string>
     <string name="title_trip">出行</string>
     <string name="title_mine">我的</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="duration_seconds">%d 秒</string>
     <string name="duration_minutes">%d 分钟</string>
@@ -10,5 +9,9 @@
     <string name="duration_hours_with_minutes">%d 小时 %d 分</string>
     <string name="distance_meters">%d 米</string>
     <string name="distance_kilometers">%d 千米</string>
+    <string name="distance_transit_walk">步行 %d 分钟</string>
+    <string name="distance_transit_rail">铁路 %s</string>
+    <string name="distance_transit_bus">公交 %s</string>
+    <string name="distance_transit_subway">地铁 %s</string>
     <string name="toast_wait_for_location">请等待定位</string>
 </resources>
