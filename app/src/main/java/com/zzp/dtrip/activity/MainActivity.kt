@@ -18,6 +18,7 @@ import com.huawei.hms.mlsdk.common.MLApplication
 import com.zzp.dtrip.R
 import com.zzp.dtrip.fragment.MineFragment
 import com.zzp.dtrip.fragment.TripFragment
+import com.zzp.dtrip.util.TtsUtil
 
 class MainActivity : AppCompatActivity() {
 
