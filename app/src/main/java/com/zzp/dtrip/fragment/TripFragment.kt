@@ -2,6 +2,7 @@ package com.zzp.dtrip.fragment
 
 import android.Manifest
 import android.app.ActivityOptions
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.TransitionDrawable
@@ -50,6 +51,7 @@ import com.zzp.dtrip.activity.SoundActivity
 import com.zzp.dtrip.util.MetricUtil
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
+import java.util.concurrent.TimeUnit
 
 
 class TripFragment : Fragment(), TencentLocationListener, LocationSource {
@@ -108,6 +110,7 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
     data class Route (val route: JsonComposer, val type: RouteType)
     private var routeResult: RouteResult? = null
     private var currentRoute: Route? = null
+    private var destinationPoint: LatLng? = null
     private var currentRouteSelected = -1
     private var currentPolylinePointSet: List<LatLng>? = null
     private var currentPolyline: Polyline? = null
@@ -115,6 +118,7 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
     private lateinit var sheetNavigationDirectionText: TextView
     private var currentInNavigation = false
     private var currentTotalDistance = 0
+    private var currentPoint = 0
     private var navigationLocation = ""
 
     private var locationChangedListener: OnLocationChangedListener? = null
@@ -277,7 +281,8 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
             currentPolyline!!.setEraseable(true)
             // 初始化数据
             currentInNavigation = true
-            navigationLocation = currentLocation.address
+            navigationLocation = "${currentLocation.name}(${currentLocation.address})"
+            currentPoint = 0
             // UI 动画
             routeRecycler.visibility = View.GONE
             sheetNavigationDirectionText.visibility = View.VISIBLE
@@ -357,9 +362,9 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
             sheetAddressText.text = SearchActivity.resultList[position].address
             sheetLayout.visibility = View.VISIBLE
             // 标注并将地图定位移动至对应坐标
-            val targetPosition = LatLng(SearchActivity.resultList[position].location.lat, SearchActivity.resultList[position].location.lng)
-            targetMarker = tencentMap.addMarker(MarkerOptions(targetPosition))
-            tencentMap.animateCamera(CameraUpdateFactory.newLatLng(targetPosition))
+            destinationPoint = LatLng(SearchActivity.resultList[position].location.lat, SearchActivity.resultList[position].location.lng)
+            targetMarker = tencentMap.addMarker(MarkerOptions(destinationPoint!!))
+            tencentMap.animateCamera(CameraUpdateFactory.newLatLng(destinationPoint))
         }
         openingSearch = false
     }
@@ -369,16 +374,21 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         if (!openingSearch)
             mapView.onPause()
         targetMarker?.remove()
+        position = -1
 
         // 自动隐藏已有路线
-        arrayOf(sheetRouteDriveButton, sheetRouteWalkButton, sheetRouteTransitButton, sheetRouteBicycleButton).forEach {
-            it.background = ResourcesCompat.getDrawable(resources, android.R.color.transparent, requireActivity().theme)
+        if (!currentInNavigation) {
+            arrayOf(sheetRouteDriveButton, sheetRouteWalkButton, sheetRouteTransitButton, sheetRouteBicycleButton).forEach {
+                it.background = ResourcesCompat.getDrawable(
+                    resources,
+                    android.R.color.transparent,
+                    requireActivity().theme
+                )
+            }
+            resetPolylineAndRouteSelection()
+            routeRecycler.visibility = View.GONE
+            routeDivider.visibility = View.GONE
         }
-        resetPolylineAndRouteSelection()
-        routeRecycler.visibility = View.GONE
-        routeDivider.visibility = View.GONE
-        currentInNavigation = false
-        sheetNavigationDirectionText.visibility = View.GONE
     }
 
     override fun onStop() {
@@ -427,10 +437,17 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
                     currentTotalDistance += TencentLocationUtils.distanceBetween(currentLocation, tencentLocation).toInt()
                     tencentMap.animateCamera(CameraUpdateFactory.newLatLng(LatLng(tencentLocation.latitude, tencentLocation.longitude)))
                     // 擦除线
-                    currentPolyline?.eraseTo(1, LatLng(tencentLocation.latitude, tencentLocation.longitude))
+                    if (currentPoint < currentPolylinePointSet!!.size - 1
+                            && MetricUtil.distanceBetween(currentPolylinePointSet!![currentPoint], currentPolylinePointSet!![currentPoint+1])
+                            < MetricUtil.distanceBetween(currentPolylinePointSet!![currentPoint], LatLng(tencentLocation.latitude, tencentLocation.longitude)))
+                        currentPoint++
+                    currentPolyline?.eraseTo(currentPoint, LatLng(tencentLocation.latitude, tencentLocation.longitude))
+                    if (MetricUtil.distanceBetween(LatLng(tencentLocation.latitude, tencentLocation.longitude), destinationPoint!!) < 50) {
+                        sheetCloseButton.performClick()
+                    }
                 } else {
                     if (currentTotalDistance != 0) {
-                        navigationLocation += ",${tencentLocation.name}"
+                        navigationLocation += ",${tencentLocation.name}(${tencentLocation.address})"
                         // TODO: 上传数据
                         Log.d(TAG, "导航结束，$navigationLocation, $currentTotalDistance")
                         currentTotalDistance = 0

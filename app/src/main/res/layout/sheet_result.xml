@@ -28,7 +28,7 @@
         android:gravity="center_vertical"
         style="?attr/bottomSheetStyle"
         app:behavior_hideable="true"
-        app:behavior_peekHeight="180dp"
+        app:behavior_peekHeight="240dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <androidx.constraintlayout.widget.ConstraintLayout
