@@ -17,10 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.zzp.dtrip.R
 import com.zzp.dtrip.adapter.AddressAdapter
-import com.zzp.dtrip.data.Data
-import com.zzp.dtrip.data.DataX
-import com.zzp.dtrip.data.ExploreResult
-import com.zzp.dtrip.data.SuggestionResult
+import com.zzp.dtrip.data.*
 import com.zzp.dtrip.fragment.TripFragment
 import com.zzp.dtrip.util.TencentAppService
 import com.zzp.dtrip.util.TencentRetrofitManager
@@ -31,7 +28,7 @@ import retrofit2.Response
 class SearchActivity : AppCompatActivity() {
 
     companion object {
-        val resultList = ArrayList<Data>()
+        val resultList = ArrayList<BigData>()
     }
 
     private lateinit var searchEdit: EditText
@@ -55,16 +52,6 @@ class SearchActivity : AppCompatActivity() {
         initRecyclerView()
         initEdit()
         getExplore()
-        searchButton.setOnClickListener {
-            keyword = searchEdit.text.toString()
-            if (keyword.trim().isEmpty()) {
-                Toast.makeText(this, "输入为空",
-                    Toast.LENGTH_SHORT).show()
-            }
-            else {
-                getSuggestion()
-            }
-        }
     }
 
     override fun onResume() {
@@ -79,7 +66,6 @@ class SearchActivity : AppCompatActivity() {
 
     private fun findViewById() {
         searchEdit = findViewById(R.id.search_edit)
-        searchButton = findViewById(R.id.search_button)
         recyclerView = findViewById(R.id.address_recycler)
     }
 
@@ -123,7 +109,8 @@ class SearchActivity : AppCompatActivity() {
                             resultList.clear()
                         }
                         for (obj in this.data) {
-                            resultList.add(obj)
+                            val objs = BigData(obj)
+                            resultList.add(objs)
                         }
                         adapter?.notifyDataSetChanged()
                     }
@@ -153,9 +140,7 @@ class SearchActivity : AppCompatActivity() {
                             resultList.clear()
                         }
                         for (obj in this.data) {
-                            val objs = Data(obj.ad_info.adcode, obj.address, obj.category,
-                                obj.ad_info.city, obj.ad_info.district, obj.id, obj.location,
-                                obj.ad_info.province, obj.title, 0)
+                            val objs = BigData(obj)
                             resultList.add(objs)
                         }
                         adapter?.notifyDataSetChanged()
