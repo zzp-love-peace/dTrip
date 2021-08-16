@@ -6,6 +6,7 @@ import com.zzp.dtrip.data.NearbyResult
 import com.zzp.dtrip.data.SuggestionResult
 import retrofit2.Call
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface TencentAppService {
@@ -26,5 +27,6 @@ interface TencentAppService {
     @GET("/ws/geocoder/v1/?location=")
     fun getCurrentAddress(@Query("location") location: String,
                           @Query("key") key: String) : Call<CurrentAddressResult>
+
 
 }

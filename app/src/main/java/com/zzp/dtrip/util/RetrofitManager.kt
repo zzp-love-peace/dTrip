@@ -6,9 +6,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 object RetrofitManager {
 
 //    端口号
-    private const val post = ""
+    private const val post = "5240"
 
-    private const val BASE_URL = "http://101.34.85.209:$post"
+    private const val BASE_URL = "http://101.34.85.209:5240"
 
     private val retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)

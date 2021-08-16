@@ -14,4 +14,7 @@
     <string name="distance_transit_bus">公交 %s</string>
     <string name="distance_transit_subway">地铁 %s</string>
     <string name="toast_wait_for_location">请等待定位</string>
+    <string name="camera_string">\t\t拍照</string>
+    <string name="album_string">\t\t从相册中选择照片\t</string>
+    <string name="cancel_string">\t\t取消</string>
 </resources>
