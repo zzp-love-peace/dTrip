@@ -92,7 +92,6 @@ class InformationActivity : AppCompatActivity() {
             else {
                 Toast.makeText(this, "修改成功", Toast.LENGTH_SHORT).show()
             }
-
         }
     }
 

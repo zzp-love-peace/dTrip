@@ -5,4 +5,5 @@ object UserInformation {
     var password = ""
     var sex = -1
     var ID = -1
+    var isLogin = false
 }
