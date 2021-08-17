@@ -82,7 +82,8 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun postRegister() {
         val appService = RetrofitManager.create<AppService>()
-        val task = appService.postRegister(RegisterBody(username, password, sex))
+        val sexNum = if (sex == "男") 0 else 1
+        val task = appService.postRegister(RegisterBody(username, password, sexNum.toString()))
         task.enqueue(object : Callback<NormalResult>{
             override fun onResponse(call: Call<NormalResult>,
                                     response: Response<NormalResult>) {
