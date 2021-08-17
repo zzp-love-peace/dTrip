@@ -9,6 +9,8 @@ import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.os.Looper
+import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,6 +25,8 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.transition.Slide
+import androidx.transition.TransitionManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.tencent.lbssearch.TencentSearch
@@ -31,10 +35,7 @@ import com.tencent.lbssearch.`object`.param.DrivingParam
 import com.tencent.lbssearch.`object`.param.TransitParam
 import com.tencent.lbssearch.`object`.param.WalkingParam
 import com.tencent.lbssearch.`object`.result.*
-import com.tencent.map.geolocation.TencentLocation
-import com.tencent.map.geolocation.TencentLocationListener
-import com.tencent.map.geolocation.TencentLocationManager
-import com.tencent.map.geolocation.TencentLocationRequest
+import com.tencent.map.geolocation.*
 import com.tencent.map.tools.json.JsonComposer
 import com.tencent.map.tools.net.http.HttpResponseListener
 import com.tencent.tencentmap.mapsdk.maps.*
@@ -110,6 +111,11 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
     private var currentRouteSelected = -1
     private var currentPolylinePointSet: List<LatLng>? = null
     private var currentPolyline: Polyline? = null
+    // 导航（粗犷版）
+    private lateinit var sheetNavigationDirectionText: TextView
+    private var currentInNavigation = false
+    private var currentTotalDistance = 0
+    private var navigationLocation = ""
 
     private var locationChangedListener: OnLocationChangedListener? = null
 
@@ -166,6 +172,8 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
             sheetContentBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             if(::currentLocation.isInitialized)
                 tencentMap.animateCamera(CameraUpdateFactory.newLatLng(LatLng(currentLocation.latitude, currentLocation.longitude)))
+            currentInNavigation = false
+            sheetNavigationDirectionText.visibility = View.GONE
         }
         arrayOf(sheetRouteDriveButton, sheetRouteWalkButton, sheetRouteTransitButton, sheetRouteBicycleButton).let { array ->
             array.forEach { button ->
@@ -257,7 +265,22 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
 
         // FAB 事件：出发
         sheetRouteButton.setOnClickListener {
-            Toast.makeText(requireContext(), "这里应该会有一个导航", Toast.LENGTH_SHORT).show()
+            resetPolylineAndRouteSelection()
+            // 绘制线
+            currentPolyline = tencentMap.addPolyline(PolylineOptions().apply {
+                addAll(currentPolylinePointSet)
+                lineCap(true)
+                color(ResourcesCompat.getColor(resources, R.color.blue, requireActivity().theme))
+                width(20F)
+                eraseColor(ResourcesCompat.getColor(resources, R.color.gray, requireActivity().theme))
+            })
+            currentPolyline!!.setEraseable(true)
+            // 初始化数据
+            currentInNavigation = true
+            navigationLocation = currentLocation.address
+            // UI 动画
+            routeRecycler.visibility = View.GONE
+            sheetNavigationDirectionText.visibility = View.VISIBLE
         }
         return root
     }
@@ -301,6 +324,8 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
 
         routeDivider = root.findViewById(R.id.sheet_route_divider)
         routeRecycler = root.findViewById(R.id.sheet_route_recycler)
+
+        sheetNavigationDirectionText = root.findViewById(R.id.sheet_navi_direction)
     }
 
     private fun initMap() {
@@ -352,6 +377,8 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         resetPolylineAndRouteSelection()
         routeRecycler.visibility = View.GONE
         routeDivider.visibility = View.GONE
+        currentInNavigation = false
+        sheetNavigationDirectionText.visibility = View.GONE
     }
 
     override fun onStop() {
@@ -394,6 +421,21 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
                     tencentMap.moveCamera(CameraUpdateFactory.newLatLng(newLatLng))
                     tencentMap.addMarker(MarkerOptions(newLatLng))
                     flag = !flag
+                }
+                // 导航
+                if (currentInNavigation) {
+                    currentTotalDistance += TencentLocationUtils.distanceBetween(currentLocation, tencentLocation).toInt()
+                    tencentMap.animateCamera(CameraUpdateFactory.newLatLng(LatLng(tencentLocation.latitude, tencentLocation.longitude)))
+                    // 擦除线
+                    currentPolyline?.eraseTo(1, LatLng(tencentLocation.latitude, tencentLocation.longitude))
+                } else {
+                    if (currentTotalDistance != 0) {
+                        navigationLocation += ",${tencentLocation.name}"
+                        // TODO: 上传数据
+                        Log.d(TAG, "导航结束，$navigationLocation, $currentTotalDistance")
+                        currentTotalDistance = 0
+                        resetPolylineAndRouteSelection()
+                    }
                 }
 
                 currentLocation = tencentLocation
@@ -509,8 +551,15 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
                 routeAdapter!!.setData(routeResult!!.resultObject, routeResult!!.type)
             }
             routeAdapter?.notifyDataSetChanged()
-            routeDivider.visibility = View.VISIBLE
-            routeRecycler.visibility = View.VISIBLE
+            if (routeRecycler.visibility != View.VISIBLE) {
+                routeDivider.visibility = View.VISIBLE
+                val slideUpTransition = Slide(Gravity.BOTTOM).apply {
+                    duration = 200L
+                    addTarget(routeRecycler)
+                }
+                TransitionManager.beginDelayedTransition(sheetLayout, slideUpTransition)
+                routeRecycler.visibility = View.VISIBLE
+            }
         } else {
             routeDivider.visibility = View.GONE
             routeRecycler.visibility = View.GONE
@@ -540,7 +589,6 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RouteHolder = RouteHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_route, parent, false))
 
         override fun onBindViewHolder(holder: RouteHolder, position: Int) {
-            // TODO: 在 distanceText 上展示不同（主要是公交）线路的具体步骤
             when (type) {
                 RouteType.Drive ->
                     (result as DrivingResultObject).result.routes.let {
@@ -583,12 +631,17 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
             }
             holder.layout.setOnClickListener {
                 if (currentRouteSelected != holder.adapterPosition) {
+                    // 更改选择状态
                     val previousPosition = currentRouteSelected
                     currentRouteSelected = holder.adapterPosition
                     notifyItemChanged(previousPosition)
                     notifyItemChanged(holder.adapterPosition)
+                    // 移除上次选择
                     if (currentPolyline != null)
                         currentPolyline!!.remove()
+                    // 点击后收起 bottom sheet
+                    if (sheetContentBehavior.state == BottomSheetBehavior.STATE_EXPANDED)
+                        sheetContentBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                     // 根据类型不同，应用、合并不同线路
                     currentRoute = Route(when (type) {
                         RouteType.Drive ->
@@ -626,12 +679,14 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
                         addAll(currentPolylinePointSet)
                         lineCap(true)
                         color(ResourcesCompat.getColor(resources, R.color.purple_500, requireActivity().theme))
-                        width(10F)
+                        width(20F)
                     })
                     tencentMap.animateCamera(CameraUpdateFactory.newLatLngBounds(LatLngBounds.builder().include(currentPolyline!!.points).build(), 100))
                     // 显示 FAB
                     if (sheetRouteButton.visibility == View.GONE)
                         sheetRouteButton.startAnimation(sheetRouteButtonShowAnim)
+                    // 更新导航信息
+                    sheetNavigationDirectionText.text = if (currentRoute!!.type == RouteType.Transit) holder.distanceText.text else getString(R.string.hint_navigation_ongoing)
                 }
             }
             if (currentRouteSelected == position && !holder.transitionFinished) {
