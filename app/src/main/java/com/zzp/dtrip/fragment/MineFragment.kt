@@ -21,6 +21,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputLayout
 import com.zzp.dtrip.R
+import com.zzp.dtrip.activity.FaceLoginActivity
 import com.zzp.dtrip.activity.InformationActivity
 import com.zzp.dtrip.activity.LoginActivity
 import com.zzp.dtrip.activity.ReplaceActivity
@@ -80,7 +81,8 @@ class MineFragment : Fragment() {
 
         faceLayout.setOnClickListener {
             if (UserInformation.isLogin) {
-
+                val intent = Intent(requireContext(),FaceLoginActivity::class.java)
+                startActivity(intent)
             }
             else {
                 val intent = Intent(requireContext(), LoginActivity::class.java)

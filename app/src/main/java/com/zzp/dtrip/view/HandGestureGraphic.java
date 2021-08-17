@@ -9,6 +9,9 @@ import android.graphics.Rect;
 import com.huawei.hms.mlsdk.gesture.MLGesture;
 
 import java.util.List;
+/**
+ * 手势识别所使用的View,不需要改动
+ */
 
 public class HandGestureGraphic extends GraphicOverlay.Graphic {
 

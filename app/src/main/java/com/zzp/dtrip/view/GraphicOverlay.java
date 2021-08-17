@@ -10,6 +10,9 @@ import com.huawei.hms.mlsdk.common.LensEngine;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * 手势识别所使用的View,不需要改动
+ */
 public class GraphicOverlay extends View {
     private final Object mLock = new Object();
 
