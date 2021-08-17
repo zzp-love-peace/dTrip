@@ -169,7 +169,7 @@ class MineFragment : Fragment() {
 
     private fun initData() {
         if (UserInformation.isLogin) {
-            usernameText.text = UserInformation.username
+            usernameText.text = "用户名:   ${UserInformation.username}"
         }
     }
 
