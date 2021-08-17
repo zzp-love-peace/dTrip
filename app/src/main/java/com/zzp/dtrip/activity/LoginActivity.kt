@@ -29,6 +29,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var entryButton: MaterialButton
     private lateinit var rememberPass: CheckBox
     private lateinit var prefs: SharedPreferences
+    private lateinit var loginFace:TextView
 
     private var username = ""
     private var password = ""
@@ -54,6 +55,10 @@ class LoginActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        loginFace.setOnClickListener { //开启人脸登录活动
+            val intent = Intent(this,FaceLoginActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun findViewById() {
@@ -62,6 +67,7 @@ class LoginActivity : AppCompatActivity() {
         registerText = findViewById(R.id.register_text)
         entryButton = findViewById(R.id.entry_button)
         rememberPass = findViewById(R.id.remember_pass)
+        loginFace = findViewById(R.id.login_by_face)
     }
 
     private fun initData() {

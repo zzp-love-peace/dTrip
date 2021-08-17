@@ -48,7 +48,7 @@ public class FaceLoginActivity extends AppCompatActivity {
     private AppService api;
 
     /**
-     * 待测试人脸比对
+     * 人脸登录逻辑待修改（控件也可修改），人脸增加细节（如重复录入人脸）可后续增加
      * @param savedInstanceState
      */
     @Override
@@ -117,12 +117,15 @@ public class FaceLoginActivity extends AppCompatActivity {
                     });
 
                 }
-                else {//在未登录的状况下，通过人脸识别登录,等待一个button
+                else {//在未登录的状况下，通过人脸识别登录
                     api.compareFace(ask).enqueue(new Callback<compareFaceResponse>() {//注意此时需要更改ask的值，因为接口提供了一个不该存在的id
                         @Override
-                        public void onResponse(Call<compareFaceResponse> call, Response<compareFaceResponse> response) {
+                        public void onResponse(Call<compareFaceResponse> call, Response<compareFaceResponse> response) {//待处理登录后逻辑，如修改UserInfo中的属性，设置登录
+                            // 状态等，可能需要将JavaBean进行修改
+                            //TODO(“请在此处写出登录成功后需要的逻辑,测试其他功能请删除此处”)
                             Toast.makeText(FaceLoginActivity.this,"登录成功",Toast.LENGTH_SHORT).show();//状态码异常，可能需要修改
                             finish();
+
                         }
                         @Override
                         public void onFailure(Call<compareFaceResponse> call, Throwable t) {
