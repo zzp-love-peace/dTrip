@@ -58,6 +58,7 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         var position = -1
         var lat = 0.0
         var lng = 0.0
+        var address = ""
     }
 
     private lateinit var mapView: MapView
@@ -369,6 +370,7 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         if (error == TencentLocation.ERROR_OK && locationChangedListener != null) {
             if (tencentLocation != null) {
                 city = tencentLocation.city
+                address = tencentLocation.address
                 val location = Location(tencentLocation.provider)
                 //设置经纬度
                 location.latitude = tencentLocation.latitude

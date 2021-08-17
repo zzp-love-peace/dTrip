@@ -2,7 +2,6 @@
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -20,9 +19,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.15" />
 
-
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/username_layout"
+        android:id="@+id/old_password_layout"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -35,20 +33,22 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.3">
+        app:layout_constraintVertical_bias="0.3"
+        app:passwordToggleEnabled="true">
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="用户名"
+            android:hint="旧密码"
             android:inputType="textPassword"
             android:maxLines="1"
             android:textSize="18sp" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
+
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/password_layout"
+        android:id="@+id/new_password_layout"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -67,16 +67,15 @@
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="密码"
+            android:hint="新密码"
             android:inputType="textPassword"
             android:maxLines="1"
             android:textSize="18sp" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
-
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/password2_layout"
+        android:id="@+id/again_password_layout"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -94,76 +93,34 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
-            android:layout_height="63dp"
-            android:hint="确认密码"
+            android:layout_height="wrap_content"
+            android:hint="确认新密码"
             android:inputType="textPassword"
             android:maxLines="1"
             android:textSize="18sp" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <RadioGroup
-        android:id="@+id/radio_group"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.75">
-
-        <com.google.android.material.radiobutton.MaterialRadioButton
-            android:id="@+id/register_man"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:layout_marginStart="40dp"
-            android:background="@drawable/man_background"
-            android:button="@null"
-            android:paddingStart="40dp"
-            android:paddingTop="10dp"
-            android:paddingEnd="40dp"
-            android:paddingBottom="10dp"
-            android:checked="true"
-            android:text="男"
-            android:textColor="@color/white"
-            android:textSize="18sp" />
-
-        <com.google.android.material.radiobutton.MaterialRadioButton
-            android:id="@+id/register_woman"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="80dp"
-            android:layout_marginEnd="40dp"
-            android:background="@drawable/woman_background"
-            android:button="@null"
-            android:paddingStart="40dp"
-            android:paddingTop="10dp"
-            android:paddingEnd="40dp"
-            android:paddingBottom="10dp"
-            android:textColor="@color/gray"
-            android:text="女"
-            android:textSize="18sp" />
-    </RadioGroup>
-
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/register_button"
+        android:id="@+id/replace_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:text="注册"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:text="提交修改"
+        android:textStyle="bold"
         android:textColor="@color/white"
-        android:textSize="24sp"
+        android:textSize="22sp"
         app:cornerRadius="15dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.9" />
+        app:layout_constraintVertical_bias="0.8" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -26,8 +26,12 @@ import com.cocosw.bottomsheet.BottomSheet
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.zzp.dtrip.R
+import com.zzp.dtrip.body.SexBody
+import com.zzp.dtrip.body.UsernameBody
+import com.zzp.dtrip.data.NormalResult
 import com.zzp.dtrip.util.AppService
 import com.zzp.dtrip.util.RetrofitManager
+import com.zzp.dtrip.util.UserInformation
 import de.hdodenhof.circleimageview.CircleImageView
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -44,6 +48,7 @@ class InformationActivity : AppCompatActivity() {
     private lateinit var headLayout: ConstraintLayout
     private lateinit var usernameEdit: TextInputEditText
     private lateinit var sexText: TextView
+    private lateinit var idText: TextView
     private lateinit var circleImage: CircleImageView
     private lateinit var changeButton: MaterialButton
 
@@ -51,6 +56,9 @@ class InformationActivity : AppCompatActivity() {
     private lateinit var headImage: File
 
     private lateinit var pref: SharedPreferences
+
+    private var username = ""
+    private var sex = ""
 
     private val takePhoto = 1
     private val fromAlbum = 2
@@ -64,7 +72,8 @@ class InformationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_information)
         findViewById()
-        pref = getPreferences(Context.MODE_PRIVATE)
+        pref = getSharedPreferences("data", Context.MODE_PRIVATE)
+        initData()
         initImageUri()
         initHeadImage()
         initpvOptions()
@@ -86,11 +95,20 @@ class InformationActivity : AppCompatActivity() {
         }
 
         changeButton.setOnClickListener {
-            if (usernameEdit.text.toString().isEmpty()) {
+            username = usernameEdit.text.toString()
+            sex = sexText.text.toString()
+            if (username.isEmpty()) {
                 usernameEdit.error = "用户名为空"
             }
             else {
-                Toast.makeText(this, "修改成功", Toast.LENGTH_SHORT).show()
+                if (username != UserInformation.username) {
+                    postUsername()
+                }
+                else {
+                    if (sex != UserInformation.sex) {
+                        postSex()
+                    }
+                }
             }
         }
     }
@@ -100,6 +118,7 @@ class InformationActivity : AppCompatActivity() {
         headLayout = findViewById(R.id.head_layout)
         usernameEdit = findViewById(R.id.username_edit)
         sexText = findViewById(R.id.sex_text)
+        idText = findViewById(R.id.id_text)
         circleImage = findViewById(R.id.circle_image)
         changeButton = findViewById(R.id.change_button)
     }
@@ -177,9 +196,6 @@ class InformationActivity : AppCompatActivity() {
             imageUri = this.toUri()
         }
         flag = pref.getInt("flag", -1)
-        Log.d(TAG, "imageUri: $imageUri")
-        Log.d(TAG, "string: $string")
-        Log.d(TAG, "flag: $flag")
     }
 
     private fun saveImageUri(flag: Int) {
@@ -195,6 +211,7 @@ class InformationActivity : AppCompatActivity() {
                 options1, _, _, v -> //点击确定按钮后触发
             val str = sexList[options1]
             sexText.text = str
+            sex = str
         }.build()
         pvOptions.setPicker(sexList as List<Any>?)
     }
@@ -221,5 +238,75 @@ class InformationActivity : AppCompatActivity() {
         intent.addCategory(Intent.CATEGORY_OPENABLE)
         intent.type = "image/*"
         startActivityForResult(intent, fromAlbum)
+    }
+
+    private fun initData() {
+        Log.d(TAG, "initData: ${UserInformation.sex}")
+        sexText.text = UserInformation.sex
+        usernameEdit.setText(UserInformation.username)
+        idText.text = UserInformation.ID.toString()
+    }
+
+    private fun postUsername() {
+        val appService = RetrofitManager.create<AppService>()
+        val task = appService.postUsername(
+            UsernameBody(UserInformation.username,
+            UserInformation.password, username)
+        )
+        task.enqueue(object : Callback<NormalResult>{
+            override fun onResponse(call: Call<NormalResult>,
+                                    response: Response<NormalResult>) {
+                response.body()?.apply {
+                    if (errorCode == 0) {
+                        Log.d(TAG, "onResponse:aaa $sex")
+                        Log.d(TAG, "onResponse:bbb ${UserInformation.sex}")
+                        UserInformation.username = username
+                        if (sex != UserInformation.sex) {
+                            postSex()
+                        }
+                        else {
+                            Toast.makeText(this@InformationActivity,
+                                "修改成功", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    else {
+                        Toast.makeText(this@InformationActivity,
+                            errorMsg, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<NormalResult>, t: Throwable) {
+                Log.d(TAG, "onFailure: $t")
+            }
+        })
+    }
+
+    private fun postSex() {
+        val appService = RetrofitManager.create<AppService>()
+        val task = appService.postSex(
+            SexBody(UserInformation.username,
+                    UserInformation.password, sex)
+        )
+        Log.d(TAG, "postSex: $sex")
+        task.enqueue(object : Callback<NormalResult>{
+            override fun onResponse(call: Call<NormalResult>,
+                                    response: Response<NormalResult>) {
+                response.body()?.apply {
+                    if (errorCode == 0) {
+                        UserInformation.sex = sex
+                        Toast.makeText(this@InformationActivity, "修改成功",
+                            Toast.LENGTH_SHORT).show()                    }
+                    else {
+                        Toast.makeText(this@InformationActivity,
+                            errorMsg, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<NormalResult>, t: Throwable) {
+                Log.d(TAG, "onFailure: $t")
+            }
+        })
     }
 }
