@@ -45,6 +45,7 @@ class SoundService : Service() {
                     sendBroadcast(intent)
                     text = "笑声"
                 }
+
                 MLSoundDectConstants.SOUND_EVENT_TYPE_BABY_CRY->{
                     Log.d(TAG,"捕捉到婴儿哭声")
 //                    Toast.makeText(this@SoundService,"捕捉到婴儿哭声", Toast.LENGTH_SHORT).show()
@@ -53,6 +54,7 @@ class SoundService : Service() {
                     sendBroadcast(intent)
                     text = "婴儿哭声"
                 }
+
                 MLSoundDectConstants.SOUND_EVENT_TYPE_SNORING->{
                     Log.d(TAG,"捕捉到打鼾声")
 //                    Toast.makeText(this@SoundService,"捕捉到打鼾声", Toast.LENGTH_SHORT).show()
