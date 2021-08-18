@@ -48,9 +48,17 @@ import com.zzp.dtrip.activity.NearbyActivity
 import com.zzp.dtrip.activity.SearchActivity
 import com.zzp.dtrip.activity.SocialActivity
 import com.zzp.dtrip.activity.SoundActivity
+import com.zzp.dtrip.body.AddDataBody
+import com.zzp.dtrip.data.NormalResult
+import com.zzp.dtrip.util.AppService
 import com.zzp.dtrip.util.MetricUtil
+import com.zzp.dtrip.util.RetrofitManager
+import com.zzp.dtrip.util.UserInformation
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.util.concurrent.TimeUnit
 
 
@@ -448,7 +456,8 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
                 } else {
                     if (currentTotalDistance != 0) {
                         navigationLocation += ",${tencentLocation.name}(${tencentLocation.address})"
-                        // TODO: 上传数据
+                        // 上传数据
+                        postData()
                         Log.d(TAG, "导航结束，$navigationLocation, $currentTotalDistance")
                         currentTotalDistance = 0
                         resetPolylineAndRouteSelection()
@@ -730,6 +739,34 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
             this@RouteAdapter.result = result
             this@RouteAdapter.type = type
         }
+    }
+
+    private fun postData() {
+        val appService = RetrofitManager.create<AppService>()
+        val type = when (currentRoute?.type) {
+            RouteType.Bicycle -> "骑行"
+            RouteType.Drive -> "乘车"
+            RouteType.Walk -> "步行"
+            RouteType.Transit -> "公交"
+            else -> ""
+        }
+        val task = appService.postData(AddDataBody(currentTotalDistance.toString(),
+                type, UserInformation.ID, navigationLocation))
+        task.enqueue(object : Callback<NormalResult>{
+            override fun onResponse(call: Call<NormalResult>, response: Response<NormalResult>) {
+                response.body()?.apply {
+                    if (this.errorCode != 0) {
+                        Toast.makeText(requireContext(), "传参异常",
+                            Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<NormalResult>, t: Throwable) {
+                Log.d(TAG, "onFailure: $t")
+            }
+
+        })
     }
 }
 
