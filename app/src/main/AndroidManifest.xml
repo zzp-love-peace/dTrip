@@ -33,7 +33,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DTrip"
         android:usesCleartextTraffic="true">
-        <activity android:name=".activity.ReplaceActivity"></activity>
+        <activity android:name=".activity.FaceLoginActivity"></activity>
+        <activity
+            android:name=".activity.ReplaceActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activity.InformationActivity"
             android:screenOrientation="portrait" />
@@ -67,8 +70,6 @@
         <activity
             android:name=".activity.SoundActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".activity.FaceLoginActivity"
-            android:screenOrientation="portrait"/>
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/app_name"

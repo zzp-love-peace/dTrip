@@ -1,6 +1,7 @@
 package com.zzp.dtrip.util
 
 import com.zzp.dtrip.body.*
+import com.zzp.dtrip.data.FaceResult
 import com.zzp.dtrip.data.LoginResult
 import com.zzp.dtrip.data.NormalResult
 import com.zzp.dtrip.javabean.compareFaceAsk
@@ -28,12 +29,9 @@ interface AppService {
     @POST("/data/addData")
     fun postData(@Body addDataBody: AddDataBody) : Call<NormalResult>
 
-    @Headers("Content-Type: application/json", "Accept: application/json")
-    @POST("/face/compareFace")
-    fun compareFace(@Body ask: compareFaceAsk): Call<compareFaceResponse>
-
-    @Headers("Content-Type: application/json", "Accept: application/json")
     @POST("/face/addFace")
-    fun addFace(@Body ask: compareFaceAsk): Call<compareFaceResponse>
+    fun postFaceData(@Body faceBody: FaceBody) : Call<FaceResult>
 
+    @POST("/face/compareFace")
+    fun compareFace(@Body cmpFaceBody: CmpFaceBody) : Call<LoginResult>
 }

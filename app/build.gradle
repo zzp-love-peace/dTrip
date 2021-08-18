@@ -93,4 +93,6 @@ dependencies {
     implementation 'com.huawei.hms:ml-computer-vision-gesture-model:2.1.0.300'
     // 引入基础SDK
     implementation 'com.huawei.hms:ml-computer-vision-handkeypoint:2.1.0.300'
+    // 引入基础SDK
+    implementation 'com.huawei.hms:ml-computer-vision-face:2.0.5.300'
 }

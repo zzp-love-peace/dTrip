@@ -1,6 +1,8 @@
 package com.zzp.dtrip.fragment
 
+import android.app.Activity
 import android.content.*
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -8,6 +10,8 @@ import android.graphics.Matrix
 import android.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
+import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -19,14 +23,20 @@ import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.switchmaterial.SwitchMaterial
-import com.google.android.material.textfield.TextInputLayout
 import com.zzp.dtrip.R
-import com.zzp.dtrip.activity.FaceLoginActivity
 import com.zzp.dtrip.activity.InformationActivity
 import com.zzp.dtrip.activity.LoginActivity
 import com.zzp.dtrip.activity.ReplaceActivity
+import com.zzp.dtrip.body.FaceBody
+import com.zzp.dtrip.data.FaceResult
+import com.zzp.dtrip.util.AppService
+import com.zzp.dtrip.util.RetrofitManager
 import com.zzp.dtrip.util.UserInformation
 import de.hdodenhof.circleimageview.CircleImageView
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.io.ByteArrayOutputStream
 import java.io.File
 
 class MineFragment : Fragment() {
@@ -53,9 +63,13 @@ class MineFragment : Fragment() {
 
     private var imageUri: Uri? = null
 
+    private var imageBase64: String = ""
+
     private var flag = -1
 
     private val TAG = "MineFragment"
+
+    private val ADD_DATA = 3
 
     companion object {
         var switchFlag = false
@@ -81,8 +95,8 @@ class MineFragment : Fragment() {
 
         faceLayout.setOnClickListener {
             if (UserInformation.isLogin) {
-                val intent = Intent(requireContext(),FaceLoginActivity::class.java)
-                startActivity(intent)
+                val intent = Intent("android.media.action.IMAGE_CAPTURE")
+                startActivityForResult(intent, ADD_DATA)
             }
             else {
                 val intent = Intent(requireContext(), LoginActivity::class.java)
@@ -251,5 +265,86 @@ class MineFragment : Fragment() {
             bitmap.width, bitmap.height, matrix, true)
         bitmap.recycle()
         return rotatedBitmap
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        when (requestCode) {
+            1 -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    faceRecognition()
+                } else {
+                    Toast.makeText(requireContext(), "您需要开启权限",
+                        Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun faceRecognition() {
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        startActivityForResult(intent, ADD_DATA)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == ADD_DATA  && resultCode == Activity.RESULT_OK) {
+            var imageBitmap = data?.extras?.get("data") as Bitmap
+            imageBitmap = compressImage(imageBitmap)
+            val byteArrayOutputStream = ByteArrayOutputStream()
+            byteArrayOutputStream.use {
+                imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
+                val imageByteArray = it.toByteArray()
+                imageBase64 = Base64.encodeToString(imageByteArray, Base64.DEFAULT)
+                Log.d(TAG, imageBase64)
+            }
+            postFaceData()
+        }
+    }
+
+    private fun postFaceData() {
+        val appService = RetrofitManager.create<AppService>()
+        val task = appService.postFaceData(FaceBody(imageBase64, UserInformation.ID))
+        task.enqueue(object : Callback<FaceResult> {
+            override fun onResponse(call: Call<FaceResult>,
+                response: Response<FaceResult>) {
+                Log.d(TAG, "onResponse: ${response.code()}")
+                response.body()?.apply {
+                    if (isError) {
+                        Toast.makeText(requireContext()
+                            , errorMessage,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        Toast.makeText(requireContext()
+                            , "人脸录入成功",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        Log.d(TAG, "${this.code}, ${this.data}, ${this.errorMessage}, ${this.isError}, ${response.code()}")
+                        //Log.d(TAG+"i", "$imageBase64")
+                        Log.d(TAG, "onResponse: success")
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<FaceResult>, t: Throwable) {
+                Log.d(TAG, "onFailure ==> $t")
+                Toast.makeText(requireContext(), t.toString(), Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun compressImage(image :Bitmap) : Bitmap{
+        val matrix = Matrix()
+        val w = image.width
+        val h = image.height
+        val true_width = 540.0f
+        val true_height = true_width * h / w
+        if (true_width >w) return image
+        val wsx = true_height/w
+        matrix.setScale(wsx,wsx)
+        return Bitmap.createBitmap(image,0,0,w,h,matrix,true)
     }
 }

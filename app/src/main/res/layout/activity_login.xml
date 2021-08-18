@@ -94,16 +94,39 @@
         android:layout_marginEnd="32dp"
         android:paddingTop="12dp"
         android:paddingBottom="12dp"
+        app:strokeColor="@color/blue"
+        app:strokeWidth="3dp"
+        app:backgroundTint="@color/white"
         android:text="登录"
-        android:textColor="@color/white"
-        android:textStyle="bold"
-        android:textSize="22sp"
+        android:textColor="@color/blue"
+        android:textSize="20sp"
         app:cornerRadius="15dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.8" />
+        app:layout_constraintVertical_bias="0.7" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/face_entry_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:text="人脸登录"
+        android:textColor="@color/blue"
+        android:textSize="20sp"
+        app:backgroundTint="@color/white"
+        app:cornerRadius="15dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.82"
+        app:strokeColor="@color/blue"
+        app:strokeWidth="3dp" />
 
     <TextView
         android:id="@+id/register_text"
@@ -118,18 +141,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/remember_pass" />
 
-    <TextView
-        android:id="@+id/login_by_face"
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/text_underline"
-        android:text="扫脸登录"
-        android:textColor="@color/blue"
-        android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.09"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/register_text"
-        app:layout_constraintVertical_bias="0.802" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.25" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
