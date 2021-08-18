@@ -30,7 +30,7 @@ class RegisterActivity : AppCompatActivity() {
     private var username = ""
     private var password = ""
     private var passwordAgain = ""
-    private var sex = ""
+    private var sex = "男"
 
     private val TAG = "RegisterActivity"
 
@@ -59,12 +59,12 @@ class RegisterActivity : AppCompatActivity() {
                 R.id.register_man -> {
                     manButton.setTextColor(resources.getColor(R.color.white))
                     womanButton.setTextColor(resources.getColor(R.color.gray))
-                    sex = "0"
+                    sex = "男"
                 }
                 R.id.register_woman -> {
                     womanButton.setTextColor(resources.getColor(R.color.white))
                     manButton.setTextColor(resources.getColor(R.color.gray))
-                    sex = "1"
+                    sex = "女"
                 }
             }
         }

@@ -22,6 +22,7 @@ import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.zzp.dtrip.R
 import com.zzp.dtrip.activity.InformationActivity
@@ -81,6 +82,7 @@ class MineFragment : Fragment() {
         findViewById(root)
         initPrefAndSwitch()
         doRegisterReceiver()
+        initData()
         pref = requireContext().getSharedPreferences("data", Context.MODE_PRIVATE)
         informationLayout.setOnClickListener {
             if (UserInformation.isLogin) {
@@ -183,29 +185,29 @@ class MineFragment : Fragment() {
         requireContext().registerReceiver(refreshReceiver, intentFilter)
     }
 
-    private fun initData() {
-        if (UserInformation.isLogin) {
-            usernameText.text = "用户名:   ${UserInformation.username}"
-        }
-    }
-
     inner class MyBroadcastReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
                 "com.zzp.LOGIN_SUCCESS" -> {
-                    controlButton.setTextColor(resources.getColor(R.color.red))
-                    controlButton.strokeColor = ColorStateList.valueOf(resources.getColor(R.color.red))
-                    controlButton.text = "退出登录"
-                    unLogin.visibility = View.GONE
-                    usernameText.visibility = View.VISIBLE
-                    idText.visibility = View.VISIBLE
-                    usernameText.text = "用户名:   ${UserInformation.username}"
-                    idText.text = "ID:   ${UserInformation.ID}"
+                    initData()
                 }
             }
         }
     }
 
+    private fun initData() {
+        if (UserInformation.isLogin) {
+            controlButton.setTextColor(resources.getColor(R.color.red))
+            controlButton.strokeColor = ColorStateList.valueOf(resources.getColor(R.color.red))
+            controlButton.text = "退出登录"
+            unLogin.visibility = View.GONE
+            usernameText.visibility = View.VISIBLE
+            idText.visibility = View.VISIBLE
+            usernameText.text = "用户名:   ${UserInformation.username}"
+            idText.text = "ID:   ${UserInformation.ID}"
+        }
+    }
+    
     override fun onResume() {
         super.onResume()
         initData()
@@ -313,17 +315,16 @@ class MineFragment : Fragment() {
                 Log.d(TAG, "onResponse: ${response.code()}")
                 response.body()?.apply {
                     if (isError) {
-                        Toast.makeText(requireContext()
-                            , errorMessage,
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Snackbar.make(faceLayout, errorMsg, Snackbar.LENGTH_SHORT).show()
+//                        Toast.makeText(requireContext()
+//                            , errorMsg, Toast.LENGTH_SHORT).show()
+                        Log.d(TAG, "onResponse: $errorMsg")
+                        
                     } else {
                         Toast.makeText(requireContext()
                             , "人脸录入成功",
                             Toast.LENGTH_SHORT
                         ).show()
-                        Log.d(TAG, "${this.code}, ${this.data}, ${this.errorMessage}, ${this.isError}, ${response.code()}")
-                        //Log.d(TAG+"i", "$imageBase64")
                         Log.d(TAG, "onResponse: success")
                     }
                 }

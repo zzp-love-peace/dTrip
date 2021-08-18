@@ -201,7 +201,7 @@ class LoginActivity : AppCompatActivity() {
         val matrix = Matrix()
         val w = image.width
         val h = image.height
-        val true_width = 100.0f
+        val true_width = 80.0f
         val true_height = true_width * h / w
         if (true_width >w) return image
         val wsx = true_height/w
