@@ -235,8 +235,8 @@ class LoginActivity : AppCompatActivity() {
 
 //    登录成功后对UserInformation的赋值
     private fun loginSuccess(user: User) {
-        UserInformation.password = password
         UserInformation.username = user.username
+        UserInformation.password = user.password
         UserInformation.ID = user.id
         UserInformation.sex = user.sex
         Log.d(TAG, "onResponse: ${user.sex}")
