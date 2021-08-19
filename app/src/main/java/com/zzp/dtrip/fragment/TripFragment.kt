@@ -190,7 +190,7 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         arrayOf(sheetRouteDriveButton, sheetRouteWalkButton, sheetRouteTransitButton, sheetRouteBicycleButton).let { array ->
             array.forEach { button ->
                 button.setOnClickListener { _ ->
-                    if (::currentLocation.isInitialized) {
+                    if (::currentLocation.isInitialized && position != -1) {
                         // reset selected state for routes
                         resetPolylineAndRouteSelection()
                         // change background for buttons
