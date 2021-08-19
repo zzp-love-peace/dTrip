@@ -33,7 +33,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DTrip"
         android:usesCleartextTraffic="true">
-        <activity android:name=".activity.FaceLoginActivity"></activity>
+        <activity android:name=".activity.FaceLoginActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.TripDataActivity"
+            android:screenOrientation="portrait" />
+
         <activity
             android:name=".activity.ReplaceActivity"
             android:screenOrientation="portrait" />

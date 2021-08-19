@@ -28,6 +28,7 @@ import com.zzp.dtrip.R
 import com.zzp.dtrip.activity.InformationActivity
 import com.zzp.dtrip.activity.LoginActivity
 import com.zzp.dtrip.activity.ReplaceActivity
+import com.zzp.dtrip.activity.TripDataActivity
 import com.zzp.dtrip.body.FaceBody
 import com.zzp.dtrip.data.FaceResult
 import com.zzp.dtrip.util.AppService
@@ -108,7 +109,8 @@ class MineFragment : Fragment() {
 
         tripLayout.setOnClickListener {
             if (UserInformation.isLogin) {
-
+                val intent = Intent(requireContext(), TripDataActivity::class.java)
+                startActivity(intent)
             }
             else {
                 val intent = Intent(requireContext(), LoginActivity::class.java)

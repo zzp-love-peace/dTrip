@@ -3,12 +3,15 @@ package com.zzp.dtrip.activity
 import android.Manifest
 import android.content.*
 import android.content.pm.PackageManager
+import android.graphics.BlendMode
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -50,6 +53,7 @@ class SoundActivity : AppCompatActivity() {
 
     private val TAG = "SoundActivity"
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sound)
@@ -71,11 +75,13 @@ class SoundActivity : AppCompatActivity() {
                 if (ActivityCompat.checkSelfPermission(this@SoundActivity, Manifest.permission.RECORD_AUDIO)
                     == PackageManager.PERMISSION_GRANTED) {
                     myBinder.start()
+//                    floatButton.background = resources.getDrawable(R.color.gray)
                 }
                 ActivityCompat.requestPermissions(this, perms,RC_RECORD_CODE)
             }
             else {
                 myBinder.stop()
+//                floatButton.background = resources.getDrawable(R.color.blue)
             }
             SoundService.buttonFlag = !SoundService.buttonFlag
             SoundService.text = ""
@@ -112,6 +118,12 @@ class SoundActivity : AppCompatActivity() {
 
     private fun initButtonAndText() {
         floatButton.isSelected = SoundService.buttonFlag
+//        if (SoundService.buttonFlag) {
+//            floatButton.background = resources.getDrawable(R.color.gray)
+//        }
+//        else {
+//            floatButton.background = resources.getDrawable(R.color.blue)
+//        }
         if (SoundService.isVibrate) {
             stopButton.visibility = View.VISIBLE
             notifyText.setTextColor(resources.getColor(R.color.red))

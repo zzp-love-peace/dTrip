@@ -76,6 +76,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.cocosw:bottomsheet:1.5.0'
     implementation 'de.hdodenhof:circleimageview:3.0.1'
+    implementation 'com.github.lecho:hellocharts-library:1.5.8@aar'//引入helloChart图形库
     implementation 'com.contrarywind:Android-PickerView:4.1.9'
     implementation 'com.tencent.map:tencent-map-vector-sdk:4.3.5'
     implementation 'com.tencent.map.geolocation:TencentLocationSdk-openplatform:7.3.0'
