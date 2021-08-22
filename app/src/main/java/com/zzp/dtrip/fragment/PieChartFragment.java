@@ -92,7 +92,7 @@ public class PieChartFragment extends Fragment {
 
         if (hasCenterText1) {
             //data.setCenterText1("Hello!");
-            data.setCenterText1("Hello!");//此处可随意修改，但是为了界面美观，最好不要超过5个字符长度
+            data.setCenterText1("d伴行");//此处可随意修改，但是为了界面美观，最好不要超过5个字符长度
 
             // Get roboto-italic font.    //Typeface是用来设置字体的!
             Typeface tf = Typeface.createFromAsset(getActivity().getAssets(), "Roboto-Italic.ttf");
@@ -105,7 +105,7 @@ public class PieChartFragment extends Fragment {
 
         if (hasCenterText2) {
             //data.setCenterText2("Charts (Roboto Italic)");
-            data.setCenterText2("Charts ");
+            data.setCenterText2("D accompanying");
 
             Typeface tf = Typeface.createFromAsset(getActivity().getAssets(), "Roboto-Italic.ttf");
 

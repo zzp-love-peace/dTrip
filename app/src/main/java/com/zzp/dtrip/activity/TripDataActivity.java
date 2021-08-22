@@ -110,8 +110,7 @@ public class TripDataActivity extends AppCompatActivity implements RadioGroup.On
                 //在这里进行UI操作，将结果显示在界面上
                 //这里本来想重写Fragment的构造函数用来传参的，但是Fragment是用反射的方式来创建的，重写构造函数会报错。所以是用bundle来传参数。
                 Bundle bundle = new Bundle();
-                bundle.putSerializable("dataMessage", dataMessage);
-
+                //bundle.putSerializable("dataMessage", dataMessage);
 
                 recyclerView = (RecyclerView) findViewById(R.id.recyclerview);
                 textView1 = (TextView) findViewById(R.id.textView3);
@@ -124,6 +123,7 @@ public class TripDataActivity extends AppCompatActivity implements RadioGroup.On
                 miles = (RadioButton) findViewById(R.id.miles);
                 miles.setChecked(true);
                 data = dataMessage.getList();
+                initView();
 
                 LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
                 recyclerView.setLayoutManager(layoutManager);
@@ -265,5 +265,34 @@ public class TripDataActivity extends AppCompatActivity implements RadioGroup.On
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(layout, fragment);
         transaction.commit();
+    }
+
+    private void initView(){
+        textView1.setText("总里程");
+        textView2.setText("平均里程");
+        int sum = 0;
+        for (int i = 0; i < data.size(); i++) sum += data.get(i).getMileage();
+        textView3.setText("" + sum);
+        if (data.size() == 0)
+            textView4.setText("" + 0);
+        else
+            textView4.setText("" + sum / data.size());
+        Bundle bundle = new Bundle();
+        list.clear();
+        //data = dataMessage.getList();
+        bundle.putIntegerArrayList("list", (ArrayList<Integer>) list);
+        Fragment fragment_pie = new PieChartFragment();
+        Fragment fragment_column = new ColumnChartFragment();
+        Fragment fragment_line = new LineChartFragment();
+        fragment_pie.setArguments(bundle);
+        fragment_column.setArguments(bundle);
+        fragment_line.setArguments(bundle);
+
+        replaceFragment(R.id.fragment_columnChart, fragment_column);
+        replaceFragment(R.id.fragment_lineChart, fragment_line);
+        replaceFragment(R.id.fragment_pieChart, fragment_pie);
+        for (int i = 0; i < data.size(); i++) {
+            list.add(data.get(i).getMileage());
+        }
     }
 }

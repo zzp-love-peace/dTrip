@@ -32,8 +32,6 @@ public class LineChartFragment extends Fragment {
      * 折线图的相关控件
      */
     private LineChartView lineChart;
-    String[] weeks = {"周一", "周二", "周三", "周四", "周五", "周六", "周日"};//X轴的标注
-    int[] weather = {9, 7, 6, 7, 8, 6, 8};//图表的数据
     private List<PointValue> mPointValues = new ArrayList<PointValue>();
     private List<AxisValue> mAxisValues = new ArrayList<AxisValue>();
 
