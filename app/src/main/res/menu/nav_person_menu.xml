@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group
+        android:id="@+id/group1">
+        <item
+            android:id="@+id/action_personal_info"
+            android:icon="@drawable/ic_vector_information"
+            android:title="个人信息" />
+    </group>
+
+    <group
+        android:id="@+id/group2">
+        <item
+            android:id="@+id/action_personal_face"
+            android:icon="@drawable/ic_vector_face"
+            android:title="录入人脸" />
+    </group>
+
+    <group
+        android:id="@+id/group3">
+        <item
+            android:id="@+id/action_personal_data"
+            android:icon="@drawable/ic_vector_data"
+            android:title="出行数据" />
+    </group>
+
+    <group
+        android:id="@+id/group4">
+        <item
+            android:id="@+id/action_personal_password"
+            android:icon="@drawable/ic_vector_password"
+            android:title="修改密码" />
+    </group>
+
+    <group
+        android:id="@+id/group5">
+        <item
+            android:id="@+id/action_personal_home"
+            android:icon="@drawable/ic_vector_home"
+            android:title="居家模式" />
+    </group>
+
+    <group
+        android:id="@+id/group6">
+        <item
+            android:id="@+id/action_personal_about"
+            android:icon="@drawable/ic_vector_about"
+            android:title="关于我们" />
+    </group>
+
+</menu>

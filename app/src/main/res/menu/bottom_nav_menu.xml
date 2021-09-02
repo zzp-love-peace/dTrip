@@ -7,6 +7,11 @@
         android:title="@string/title_trip" />
 
     <item
+        android:id="@+id/navigation_fab"
+        android:enabled="false"
+        android:title="" />
+
+    <item
         android:id="@+id/navigation_mine"
         android:icon="@drawable/ic_mine"
         android:title="@string/title_mine" />

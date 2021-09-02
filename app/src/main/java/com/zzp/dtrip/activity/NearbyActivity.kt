@@ -39,10 +39,10 @@ class NearbyActivity : AppCompatActivity() {
     }
 
     private val imageViews = ArrayList<Int>().apply {
-        add(R.drawable.ic_food)
-        add(R.drawable.ic_hotel)
-        add(R.drawable.ic_shopping)
-        add(R.drawable.ic_scape)
+        add(R.drawable.ic_vector_food)
+        add(R.drawable.ic_vector_hotel)
+        add(R.drawable.ic_vector_shopping)
+        add(R.drawable.ic_vector_scape)
     }
 
     // 目前位置
@@ -153,6 +153,7 @@ class NearbyActivity : AppCompatActivity() {
         return view
     }
 
+    //得到地址精确值,并提供给currentAddress这个TextView控件显示于界面
     private fun getCurrentAddress() {
         val appService = TencentRetrofitManager.create<TencentAppService>()
         val location = "${TripFragment.lat},${TripFragment.lng}"

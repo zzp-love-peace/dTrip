@@ -16,19 +16,16 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.zzp.dtrip.R
-import com.zzp.dtrip.activity.InformationActivity
-import com.zzp.dtrip.activity.LoginActivity
-import com.zzp.dtrip.activity.ReplaceActivity
-import com.zzp.dtrip.activity.TripDataActivity
+import com.zzp.dtrip.activity.*
 import com.zzp.dtrip.body.FaceBody
 import com.zzp.dtrip.data.FaceResult
 import com.zzp.dtrip.util.AppService
@@ -43,10 +40,7 @@ import java.io.File
 
 class MineFragment : Fragment() {
 
-    private lateinit var informationLayout: LinearLayout
-    private lateinit var faceLayout: LinearLayout
-    private lateinit var tripLayout: LinearLayout
-    private lateinit var replaceLayout: LinearLayout
+    private lateinit var navPersonView: NavigationView
 
     private lateinit var switchMaterial: SwitchMaterial
 
@@ -54,9 +48,7 @@ class MineFragment : Fragment() {
 
     private lateinit var prefs: SharedPreferences
 
-    private lateinit var unLogin: TextView
     private lateinit var usernameText: TextView
-    private lateinit var idText: TextView
     private lateinit var headImageView: CircleImageView
 
     private lateinit var refreshReceiver: MyBroadcastReceiver
@@ -85,48 +77,57 @@ class MineFragment : Fragment() {
         doRegisterReceiver()
         initData()
         pref = requireContext().getSharedPreferences("data", Context.MODE_PRIVATE)
-        informationLayout.setOnClickListener {
-            if (UserInformation.isLogin) {
-                val intent = Intent(requireContext(), InformationActivity::class.java)
-                startActivity(intent)
-            }
-            else {
-                val intent = Intent(requireContext(), LoginActivity::class.java)
-                startActivity(intent)
-            }
-        }
 
-        faceLayout.setOnClickListener {
-            if (UserInformation.isLogin) {
-                val intent = Intent("android.media.action.IMAGE_CAPTURE")
-                startActivityForResult(intent, ADD_DATA)
+        navPersonView.setNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.action_personal_info -> {
+                    if (UserInformation.isLogin) {
+                        val intent = Intent(requireContext(), InformationActivity::class.java)
+                        startActivity(intent)
+                    }
+                    else {
+                        val intent = Intent(requireContext(), LoginActivity::class.java)
+                        startActivity(intent)
+                    }
+                }
+                R.id.action_personal_face -> {
+                    if (UserInformation.isLogin) {
+                        val intent = Intent("android.media.action.IMAGE_CAPTURE")
+                        startActivityForResult(intent, ADD_DATA)
+                    }
+                    else {
+                        val intent = Intent(requireContext(), LoginActivity::class.java)
+                        startActivity(intent)
+                    }
+                }
+                R.id.action_personal_data -> {
+                    if (UserInformation.isLogin) {
+                        val intent = Intent(requireContext(), TripDataActivity::class.java)
+                        startActivity(intent)
+                    }
+                    else {
+                        val intent = Intent(requireContext(), LoginActivity::class.java)
+                        startActivity(intent)
+                    }
+                }
+                R.id.action_personal_password -> {
+                    if (UserInformation.isLogin) {
+                        val intent = Intent(requireContext(), ReplaceActivity::class.java)
+                        startActivity(intent)
+                    }
+                    else {
+                        val intent = Intent(requireContext(), LoginActivity::class.java)
+                        startActivity(intent)
+                    }
+                }
+                R.id.action_personal_home -> {
+                }
+                R.id.action_personal_about -> {
+                    val intent = Intent(requireContext(), AboutActivity::class.java)
+                    startActivity(intent)
+                }
             }
-            else {
-                val intent = Intent(requireContext(), LoginActivity::class.java)
-                startActivity(intent)
-            }
-        }
-
-        tripLayout.setOnClickListener {
-            if (UserInformation.isLogin) {
-                val intent = Intent(requireContext(), TripDataActivity::class.java)
-                startActivity(intent)
-            }
-            else {
-                val intent = Intent(requireContext(), LoginActivity::class.java)
-                startActivity(intent)
-            }
-        }
-
-        replaceLayout.setOnClickListener {
-            if (UserInformation.isLogin) {
-                val intent = Intent(requireContext(), ReplaceActivity::class.java)
-                startActivity(intent)
-            }
-            else {
-                val intent = Intent(requireContext(), LoginActivity::class.java)
-                startActivity(intent)
-            }
+            false
         }
 
         controlButton.setOnClickListener {
@@ -136,9 +137,7 @@ class MineFragment : Fragment() {
                 controlButton.text = "登录"
                 UserInformation.setDataNull()
                 Toast.makeText(requireContext(), "您已退出登录", Toast.LENGTH_SHORT).show()
-                usernameText.visibility = View.GONE
-                idText.visibility = View.GONE
-                unLogin.visibility = View.VISIBLE
+                usernameText.text = "未登录"
                 headImageView.setImageResource(R.drawable.ic_head_image)
             }
             else {
@@ -155,15 +154,10 @@ class MineFragment : Fragment() {
     }
 
     private fun findViewById(root: View) {
-        informationLayout = root.findViewById(R.id.information_layout)
-        faceLayout = root.findViewById(R.id.face_layout)
-        tripLayout= root.findViewById(R.id.trip_layout)
-        replaceLayout = root.findViewById(R.id.replace_layout)
+        navPersonView = root.findViewById(R.id.nav_person_view)
         switchMaterial = root.findViewById(R.id.switch_material)
         controlButton = root.findViewById(R.id.control_button)
-        unLogin = root.findViewById(R.id.unlogin_text)
         usernameText = root.findViewById(R.id.username_text)
-        idText = root.findViewById(R.id.id_text)
         headImageView = root.findViewById(R.id.head_image)
     }
 
@@ -202,11 +196,7 @@ class MineFragment : Fragment() {
             controlButton.setTextColor(resources.getColor(R.color.red))
             controlButton.strokeColor = ColorStateList.valueOf(resources.getColor(R.color.red))
             controlButton.text = "退出登录"
-            unLogin.visibility = View.GONE
-            usernameText.visibility = View.VISIBLE
-            idText.visibility = View.VISIBLE
-            usernameText.text = "用户名:   ${UserInformation.username}"
-            idText.text = "ID:   ${UserInformation.ID}"
+            usernameText.text = UserInformation.username
         }
     }
     
@@ -317,10 +307,10 @@ class MineFragment : Fragment() {
                 Log.d(TAG, "onResponse: ${response.code()}")
                 response.body()?.apply {
                     if (isError) {
-                        Snackbar.make(faceLayout, errorMsg, Snackbar.LENGTH_SHORT).show()
+                        Snackbar.make(requireView(), errorMessage, Snackbar.LENGTH_SHORT).show()
 //                        Toast.makeText(requireContext()
 //                            , errorMsg, Toast.LENGTH_SHORT).show()
-                        Log.d(TAG, "onResponse: $errorMsg")
+                        Log.d(TAG, "onResponse: $errorMessage")
                         
                     } else {
                         Toast.makeText(requireContext()

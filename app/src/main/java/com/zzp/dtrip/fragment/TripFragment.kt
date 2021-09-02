@@ -2,7 +2,6 @@ package com.zzp.dtrip.fragment
 
 import android.Manifest
 import android.app.ActivityOptions
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.TransitionDrawable
@@ -44,10 +43,7 @@ import com.tencent.tencentmap.mapsdk.maps.LocationSource.OnLocationChangedListen
 import com.tencent.tencentmap.mapsdk.maps.model.*
 import com.tencent.tencentmap.mapsdk.maps.model.MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER
 import com.zzp.dtrip.R
-import com.zzp.dtrip.activity.NearbyActivity
-import com.zzp.dtrip.activity.SearchActivity
-import com.zzp.dtrip.activity.SocialActivity
-import com.zzp.dtrip.activity.SoundActivity
+import com.zzp.dtrip.activity.*
 import com.zzp.dtrip.body.AddDataBody
 import com.zzp.dtrip.data.NormalResult
 import com.zzp.dtrip.util.AppService
@@ -87,9 +83,11 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
 
     private lateinit var searchEdit: EditText
 
-    private lateinit var aroundButton: ImageButton
-    private lateinit var sayingButton: ImageButton
-    private lateinit var hearingButton: ImageButton
+    private lateinit var aroundButton: LinearLayout
+    private lateinit var sayingButton: LinearLayout
+    private lateinit var hearingButton: LinearLayout
+    private lateinit var gestureButton: LinearLayout
+    private lateinit var synthesisButton: LinearLayout
 
     private lateinit var sheetLayout: CoordinatorLayout
     private lateinit var sheetCloseButton: ImageButton
@@ -175,6 +173,14 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         }
         aroundButton.setOnClickListener {
             val intent = Intent(requireContext(), NearbyActivity::class.java)
+            startActivity(intent)
+        }
+        gestureButton.setOnClickListener {
+            val intent = Intent(requireContext(), LiveHandGestureAnalyseActivity::class.java)
+            startActivity(intent)
+        }
+        synthesisButton.setOnClickListener {
+            val intent = Intent(requireContext(), SynthesisActivity::class.java)
             startActivity(intent)
         }
 
@@ -304,6 +310,8 @@ class TripFragment : Fragment(), TencentLocationListener, LocationSource {
         sayingButton = root.findViewById(R.id.saying_button)
         hearingButton = root.findViewById(R.id.hearing_button)
         aroundButton = root.findViewById(R.id.around_button)
+        gestureButton = root.findViewById(R.id.gesture_button)
+        synthesisButton = root.findViewById(R.id.voice_button)
 
         sheetLayout = root.findViewById(R.id.search_result_sheet)
         sheetCloseButton = root.findViewById(R.id.sheet_close_button)

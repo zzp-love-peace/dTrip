@@ -26,70 +26,128 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.87" />
+        app:layout_constraintGuide_percent="0.876881" />
 
-    <androidx.appcompat.widget.AppCompatImageButton
-        android:id="@+id/hearing_button"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:src="@drawable/ic_hearing"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline2" />
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/guideline2">
 
+        <LinearLayout
+            android:id="@+id/saying_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-    <androidx.appcompat.widget.AppCompatImageButton
-        android:id="@+id/saying_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:src="@drawable/ic_saying"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline2" />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/ic_vector_saying"/>
 
-    <androidx.appcompat.widget.AppCompatImageButton
-        android:id="@+id/around_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:src="@drawable/ic_around"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.8"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline2" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textColor="@color/dark_gray"
+                android:text="可视化交流"/>
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="可视化交流"
-        android:textColor="@color/black"
-        app:layout_constraintEnd_toEndOf="@+id/saying_button"
-        app:layout_constraintStart_toStartOf="@+id/saying_button"
-        app:layout_constraintTop_toBottomOf="@+id/saying_button" />
+        </LinearLayout>
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="声音报警"
-        android:textColor="@color/black"
-        app:layout_constraintEnd_toEndOf="@+id/hearing_button"
-        app:layout_constraintStart_toStartOf="@+id/hearing_button"
-        app:layout_constraintTop_toBottomOf="@+id/hearing_button" />
+        <LinearLayout
+            android:id="@+id/hearing_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="周边搜索"
-        android:textColor="@color/black"
-        app:layout_constraintEnd_toEndOf="@+id/around_button"
-        app:layout_constraintStart_toStartOf="@+id/around_button"
-        app:layout_constraintTop_toBottomOf="@+id/around_button" />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/ic_vector_hearing"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textColor="@color/dark_gray"
+                android:text="声音报警"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/around_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/ic_vector_around"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textColor="@color/dark_gray"
+                android:text="周边搜索"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/gesture_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/ic_vector_gesture"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textColor="@color/dark_gray"
+                android:text="手势识别"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/voice_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/ic_vector_synthesis"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textColor="@color/dark_gray"
+                android:text="语音合成"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
 
     <EditText
         android:id="@+id/search_edit"
@@ -98,13 +156,14 @@
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:background="@drawable/input_background"
-        android:drawableStart="@drawable/ic_search"
+        android:drawableStart="@drawable/ic_vector_search"
         android:inputType="text"
+        android:hint="查找地点、公交、地铁"
         android:transitionName="search_edit"
         app:layout_constraintBottom_toTopOf="@+id/guideline2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/map_view" />
+        app:layout_constraintTop_toBottomOf="@+id/guideline" />
 
     <include
         layout="@layout/sheet_result"
