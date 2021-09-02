@@ -55,6 +55,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:textColor="@color/dark_gray"
+                android:textSize="12sp"
+                android:layout_marginTop="3dp"
                 android:text="可视化交流"/>
 
         </LinearLayout>
@@ -77,6 +79,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:textColor="@color/dark_gray"
+                android:textSize="12sp"
+                android:layout_marginTop="3dp"
                 android:text="声音报警"/>
 
         </LinearLayout>
@@ -99,6 +103,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:textColor="@color/dark_gray"
+                android:textSize="12sp"
+                android:layout_marginTop="3dp"
                 android:text="周边搜索"/>
 
         </LinearLayout>
@@ -121,6 +127,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:textColor="@color/dark_gray"
+                android:textSize="12sp"
+                android:layout_marginTop="3dp"
                 android:text="手势识别"/>
 
         </LinearLayout>
@@ -143,6 +151,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:textColor="@color/dark_gray"
+                android:textSize="12sp"
+                android:layout_marginTop="3dp"
                 android:text="语音合成"/>
 
         </LinearLayout>
