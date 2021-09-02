@@ -32,8 +32,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
         android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
         android:orientation="horizontal"
         app:layout_constraintTop_toBottomOf="@id/guideline2">
 
@@ -42,22 +42,23 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="?android:listChoiceBackgroundIndicator"
             android:orientation="vertical">
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:src="@drawable/ic_vector_saying"/>
+                android:src="@drawable/ic_vector_saying" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:textColor="@color/dark_gray"
-                android:textSize="12sp"
                 android:layout_marginTop="3dp"
-                android:text="可视化交流"/>
+                android:text="可视化交流"
+                android:textColor="@color/dark_gray"
+                android:textSize="12sp" />
 
         </LinearLayout>
 
@@ -66,22 +67,23 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="?android:listChoiceBackgroundIndicator"
             android:orientation="vertical">
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:src="@drawable/ic_vector_hearing"/>
+                android:src="@drawable/ic_vector_hearing" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:textColor="@color/dark_gray"
-                android:textSize="12sp"
                 android:layout_marginTop="3dp"
-                android:text="声音报警"/>
+                android:text="声音报警"
+                android:textColor="@color/dark_gray"
+                android:textSize="12sp" />
 
         </LinearLayout>
 
@@ -90,22 +92,23 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="?android:listChoiceBackgroundIndicator"
             android:orientation="vertical">
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:src="@drawable/ic_vector_around"/>
+                android:src="@drawable/ic_vector_around" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:textColor="@color/dark_gray"
-                android:textSize="12sp"
                 android:layout_marginTop="3dp"
-                android:text="周边搜索"/>
+                android:text="周边搜索"
+                android:textColor="@color/dark_gray"
+                android:textSize="12sp" />
 
         </LinearLayout>
 
@@ -114,22 +117,23 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="?android:listChoiceBackgroundIndicator"
             android:orientation="vertical">
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:src="@drawable/ic_vector_gesture"/>
+                android:src="@drawable/ic_vector_gesture" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:textColor="@color/dark_gray"
-                android:textSize="12sp"
                 android:layout_marginTop="3dp"
-                android:text="手势识别"/>
+                android:text="手势识别"
+                android:textColor="@color/dark_gray"
+                android:textSize="12sp" />
 
         </LinearLayout>
 
@@ -138,22 +142,23 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="?android:listChoiceBackgroundIndicator"
             android:orientation="vertical">
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:src="@drawable/ic_vector_synthesis"/>
+                android:src="@drawable/ic_vector_synthesis" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:textColor="@color/dark_gray"
-                android:textSize="12sp"
                 android:layout_marginTop="3dp"
-                android:text="语音合成"/>
+                android:text="语音合成"
+                android:textColor="@color/dark_gray"
+                android:textSize="12sp" />
 
         </LinearLayout>
 
@@ -167,8 +172,8 @@
         android:layout_marginEnd="20dp"
         android:background="@drawable/input_background"
         android:drawableStart="@drawable/ic_vector_search"
-        android:inputType="text"
         android:hint="查找地点、公交、地铁"
+        android:inputType="text"
         android:transitionName="search_edit"
         app:layout_constraintBottom_toTopOf="@+id/guideline2"
         app:layout_constraintEnd_toEndOf="parent"
@@ -178,7 +183,7 @@
     <include
         layout="@layout/sheet_result"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@+id/map_view"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/map_view" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
