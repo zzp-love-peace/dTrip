@@ -1,9 +1,11 @@
 package com.zzp.dtrip.activity
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
@@ -20,6 +22,8 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputLayout
@@ -81,7 +85,12 @@ class LoginActivity : AppCompatActivity() {
         }
 
         faceEntryButton.setOnClickListener { //开启人脸登录活动
-            faceLogin()
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), 1)
+            } else {
+                faceLogin()
+            }
+//            faceLogin()
 //            val intent = Intent(this, FaceLoginActivity::class.java)
 //            startActivity(intent)
         }
@@ -175,6 +184,22 @@ class LoginActivity : AppCompatActivity() {
         return flag
     }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        when (requestCode) {
+            1 -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    faceLogin()
+                } else {
+                    Toast.makeText(this, "您需要开启权限",
+                        Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
