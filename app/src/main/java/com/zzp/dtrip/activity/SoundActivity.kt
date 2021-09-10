@@ -15,9 +15,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.switchmaterial.SwitchMaterial
 import com.zzp.dtrip.R
-import com.zzp.dtrip.fragment.MineFragment
 import com.zzp.dtrip.service.SoundService
 
 import java.util.*
@@ -182,7 +180,7 @@ class SoundActivity : AppCompatActivity() {
                 }
                 "com.zzp.SOUND_EVENT_TYPE_CAR_ALARM" -> {
                     stopButton.visibility = View.VISIBLE
-                    if (MineFragment.switchFlag) {
+                    if (SettingsActivity.switchFlag) {
                         notifyText.setTextColor(resources.getColor(R.color.black))
                     }
                     else {
@@ -190,7 +188,7 @@ class SoundActivity : AppCompatActivity() {
                     }
                 }
                 "com.zzp.SOUND_EVENT_TYPE_DOOR_BELL" -> {
-                    if (MineFragment.switchFlag) {
+                    if (SettingsActivity.switchFlag) {
                         stopButton.visibility = View.VISIBLE
                         notifyText.setTextColor(resources.getColor(R.color.red))
                     }
@@ -199,7 +197,7 @@ class SoundActivity : AppCompatActivity() {
                     }
                 }
                 "com.zzp.SOUND_EVENT_TYPE_KNOCK" -> {
-                    if (MineFragment.switchFlag) {
+                    if (SettingsActivity.switchFlag) {
                         stopButton.visibility = View.VISIBLE
                         notifyText.setTextColor(resources.getColor(R.color.red))
                     }

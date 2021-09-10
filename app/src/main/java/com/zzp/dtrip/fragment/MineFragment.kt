@@ -26,32 +26,30 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.switchmaterial.SwitchMaterial
 import com.huawei.hms.mlsdk.livenessdetection.MLLivenessCapture
 import com.huawei.hms.mlsdk.livenessdetection.MLLivenessCaptureResult
 import com.zzp.dtrip.R
 import com.zzp.dtrip.activity.*
+import com.zzp.dtrip.body.DeleteFaceBody
 import com.zzp.dtrip.body.FaceBody
 import com.zzp.dtrip.data.FaceResult
 import com.zzp.dtrip.util.*
+import com.zzp.dtrip.data.NormalResult
+import com.zzp.dtrip.util.AppService
+import com.zzp.dtrip.util.RetrofitManager
+import com.zzp.dtrip.util.UserInformation
 import de.hdodenhof.circleimageview.CircleImageView
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.ArrayList
-import kotlin.concurrent.thread
 
 class MineFragment : Fragment() {
 
     private lateinit var navPersonView: NavigationView
 
-    private lateinit var switchMaterial: SwitchMaterial
-
     private lateinit var controlButton: MaterialButton
-
-    private lateinit var prefs: SharedPreferences
 
     private lateinit var usernameText: TextView
     private lateinit var headImageView: CircleImageView
@@ -103,7 +101,6 @@ class MineFragment : Fragment() {
         savedInstanceState: Bundle?): View {
         val root: View = inflater.inflate(R.layout.fragment_mine, container, false)
         findViewById(root)
-        initPrefAndSwitch()
         doRegisterReceiver()
         initData()
         pref = requireContext().getSharedPreferences("data", Context.MODE_PRIVATE)
@@ -135,6 +132,15 @@ class MineFragment : Fragment() {
                         startActivity(intent)
                     }
                 }
+                R.id.action_personal_delete -> {
+                    if (UserInformation.isLogin) {
+                        deleteFaceData()
+                    }
+                    else {
+                        val intent = Intent(requireContext(), LoginActivity::class.java)
+                        startActivity(intent)
+                    }
+                }
                 R.id.action_personal_data -> {
                     if (UserInformation.isLogin) {
                         val intent = Intent(requireContext(), TripDataActivity::class.java)
@@ -145,20 +151,8 @@ class MineFragment : Fragment() {
                         startActivity(intent)
                     }
                 }
-                R.id.action_personal_password -> {
-                    if (UserInformation.isLogin) {
-                        val intent = Intent(requireContext(), ReplaceActivity::class.java)
-                        startActivity(intent)
-                    }
-                    else {
-                        val intent = Intent(requireContext(), LoginActivity::class.java)
-                        startActivity(intent)
-                    }
-                }
-                R.id.action_personal_home -> {
-                }
-                R.id.action_personal_about -> {
-                    val intent = Intent(requireContext(), AboutActivity::class.java)
+                R.id.action_personal_setting -> {
+                    val intent = Intent(requireContext(), SettingsActivity::class.java)
                     startActivity(intent)
                 }
             }
@@ -181,32 +175,14 @@ class MineFragment : Fragment() {
             }
         }
 
-        switchMaterial.setOnCheckedChangeListener { buttonView, isChecked ->
-            switchFlag = isChecked
-            saveSwitchFlag()
-        }
         return root
     }
 
     private fun findViewById(root: View) {
         navPersonView = root.findViewById(R.id.nav_person_view)
-        switchMaterial = root.findViewById(R.id.switch_material)
         controlButton = root.findViewById(R.id.control_button)
         usernameText = root.findViewById(R.id.username_text)
         headImageView = root.findViewById(R.id.head_image)
-    }
-
-    private fun initPrefAndSwitch() {
-        prefs = requireActivity().getPreferences(Context.MODE_PRIVATE)
-        switchFlag = prefs.getBoolean("switch", false)
-        switchMaterial.isChecked = switchFlag
-        Log.d(TAG, "initPrefAndSwitch: ")
-    }
-
-    private fun saveSwitchFlag() {
-        val edit = prefs.edit()
-        edit.putBoolean("switch", switchFlag)
-        edit.apply()
     }
 
     private fun doRegisterReceiver() {
@@ -338,5 +314,28 @@ class MineFragment : Fragment() {
                 requestPermissions(permissionsList.toTypedArray(), 0)
             }
         }
+    }
+
+    private fun deleteFaceData() {
+        val appService = RetrofitManager.create<AppService>()
+        val task = appService.deleteFace(DeleteFaceBody(UserInformation.ID))
+        task.enqueue(object : Callback<NormalResult> {
+            override fun onResponse(call: Call<NormalResult>, response: Response<NormalResult>) {
+                response.body()?.apply {
+                    Log.d(TAG, "onResponse: ${response.code()} $errorCode")
+                    if (isError) {
+                        Toast.makeText(requireContext(), "无人脸数据,删除人脸失败!", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(requireContext(), "删除人脸成功!", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<NormalResult>, t: Throwable) {
+                Log.d(TAG, "onFailure ==> $t")
+                Toast.makeText(requireContext(), t.toString(), Toast.LENGTH_SHORT).show()
+            }
+
+        })
     }
 }

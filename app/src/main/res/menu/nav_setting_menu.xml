@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group
+        android:id="@+id/group1">
+        <item
+            android:id="@+id/action_personal_password"
+            android:icon="@drawable/ic_vector_password"
+            android:title="修改密码" />
+    </group>
+
+    <group
+        android:id="@+id/group2">
+        <item
+            android:id="@+id/action_personal_home"
+            android:icon="@drawable/ic_vector_home"
+            android:title="居家模式" />
+    </group>
+
+    <group
+        android:id="@+id/group3">
+        <item
+            android:id="@+id/action_personal_about"
+            android:icon="@drawable/ic_vector_about"
+            android:title="关于我们" />
+    </group>
+
+</menu>

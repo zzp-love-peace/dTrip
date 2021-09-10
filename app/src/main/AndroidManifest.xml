@@ -35,6 +35,10 @@
         android:theme="@style/Theme.DTrip"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".activity.SettingsActivity"
+            android:exported="true"
+            android:label="设置" />
+        <activity
             android:name=".activity.AboutActivity"
             android:exported="true" />
         <activity

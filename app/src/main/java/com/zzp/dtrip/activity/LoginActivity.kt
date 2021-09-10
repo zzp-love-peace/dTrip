@@ -1,6 +1,7 @@
 package com.zzp.dtrip.activity
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -32,7 +33,6 @@ import com.zzp.dtrip.util.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.io.ByteArrayOutputStream
 import java.util.*
 import kotlin.concurrent.thread
 
@@ -112,7 +112,6 @@ class LoginActivity : AppCompatActivity() {
                         spinnerLoading.visibility = View.VISIBLE
                     }
                 }
-
             } else {
                 checkPermission()
             }
@@ -206,7 +205,6 @@ class LoginActivity : AppCompatActivity() {
         }
         return flag
     }
-
 
 //    登录成功后对UserInformation的赋值
     private fun loginSuccess(user: User) {
