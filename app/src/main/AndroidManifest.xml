@@ -44,9 +44,6 @@
             android:name=".activity.LiveHandGestureAnalyseActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.FaceLoginActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".activity.TripDataActivity"
             android:screenOrientation="portrait" />
         <activity
