@@ -60,6 +60,9 @@ class LoginActivity : AppCompatActivity() {
             //检测成功的处理逻辑，检测结果可能是活体或者非活体。
             if (!result.isLive) {
                 showUserWrong("未检测出人脸", this@LoginActivity)
+                if (spinnerLoading.visibility == View.VISIBLE) {
+                    spinnerLoading.visibility = View.GONE
+                }
                 return
             }
             bitmapCurrent = result.bitmap
@@ -69,6 +72,9 @@ class LoginActivity : AppCompatActivity() {
             )
             if (bitmapCurrent == null) {
                 showUserWrong("failed to get picture!",this@LoginActivity)
+                if (spinnerLoading.visibility == View.VISIBLE) {
+                    spinnerLoading.visibility = View.GONE
+                }
                 return
             }
             compareFace(bitmapCurrent!!)
