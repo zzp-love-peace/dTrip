@@ -232,7 +232,8 @@ class LoginActivity : AppCompatActivity() {
                         loginSuccess(this.user)
                     }
                     else {
-                        showUserWrong(errorMessage, this@LoginActivity)
+                        showUserWrong(errorMsg, this@LoginActivity)
+                        Log.d(TAG, "onResponse: --> $errorMsg")
                     }
                     spinnerLoading.visibility = View.GONE
                 }
