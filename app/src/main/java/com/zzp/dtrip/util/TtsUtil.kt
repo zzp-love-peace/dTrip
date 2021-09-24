@@ -29,7 +29,6 @@ object TtsUtil {
     private val sk = "Lkfb2IswOB9nKfHqHVjnfDVrYx8Ey8b5ePL4MEp5"
     private val region = "cn-north-4" // 区域，如cn-north-1、cn-north-4
 
-
     private val projectId =
         "0d3151146e00f3082fbfc00673a0ebfa" // 项目id。登录管理控制台，鼠标移动到右上角的用户名上，在下拉列表中选择我的凭证个人设置。在我的凭证个人设置页面，可以查看用户名、帐号名，选择“项目列表”页签，在项目列表中查看项目。多项目时，展开“所属区域”，从“项目ID”列获取子项目ID。
 
@@ -114,11 +113,14 @@ object TtsUtil {
         }.start()
     }
 
+    /**
+     * 播放base64字符文件
+     */
     private fun base64StringPlayer(base64Str: String) {
         val byte = android.util.Base64.decode(base64Str, DEFAULT)
         val mediaPlayer = MediaPlayer()
-        val tempMp3 = File.createTempFile("kurchina", "wav")//play on wav format
-        tempMp3.deleteOnExit()//temp files delete?
+        val tempMp3 = File.createTempFile("kurchina", "wav")//创建临时文件，以wav模式播放
+        tempMp3.deleteOnExit()//需要考虑删除临时文件问题？
         val fileOutputStream = FileOutputStream(tempMp3)
         fileOutputStream.write(byte)
         fileOutputStream.close()
@@ -127,4 +129,5 @@ object TtsUtil {
         mediaPlayer.prepare()
         mediaPlayer.start()
     }
+
 }

@@ -1,12 +1,15 @@
 package com.zzp.dtrip.view;
 
 
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
 import com.huawei.hms.mlsdk.gesture.MLGesture;
+import com.zzp.dtrip.activity.MainActivity;
+import com.zzp.dtrip.util.TtsUtil;
 
 import java.util.List;
 /**
@@ -74,56 +77,78 @@ public class HandGestureGraphic extends GraphicOverlay.Graphic {
                     translateX((mlGesture.getRect().left + mlGesture.getRect().right) / 2f),
                     translateY((mlGesture.getRect().top + mlGesture.getRect().bottom) / 2f),
                     textPaint);
-
         }
-
+//        try {
+//            Thread.sleep(500);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
     }
 
 
+    /**
+     * 暂时需要加入同一手势不能重复播放的功能
+     * @param gestureCategory
+     * @return
+     */
     private String getChineseDescription(int gestureCategory) {
         String chineseDescription;
         switch (gestureCategory) {
             case MLGesture.ONE:
                 chineseDescription = "数字1";
+                play(chineseDescription);
                 break;
             case MLGesture.SECOND:
                 chineseDescription = "数字2";
+                play(chineseDescription);
                 break;
             case MLGesture.THREE:
                 chineseDescription = "数字3";
+                play(chineseDescription);
                 break;
             case MLGesture.FOUR:
                 chineseDescription = "数字4";
+                play(chineseDescription);
                 break;
             case MLGesture.FIVE:
                 chineseDescription = "数字5";
+                play(chineseDescription);
                 break;
             case MLGesture.SIX:
                 chineseDescription = "数字6";
+                play(chineseDescription);
                 break;
             case MLGesture.SEVEN:
                 chineseDescription = "数字7";
+                play(chineseDescription);
                 break;
             case MLGesture.EIGHT:
                 chineseDescription = "数字8";
+                play(chineseDescription);
                 break;
             case MLGesture.NINE:
                 chineseDescription = "数字9";
+                play(chineseDescription);
                 break;
             case MLGesture.DISS:
                 chineseDescription = "差评";
+                play(chineseDescription);
                 break;
             case MLGesture.FIST:
                 chineseDescription = "握拳";
+                play(chineseDescription);
                 break;
             case MLGesture.GOOD:
                 chineseDescription = "点赞";
+                play(chineseDescription);
                 break;
             case MLGesture.HEART:
                 chineseDescription = "单手比心";
+                play(chineseDescription);
                 break;
             case MLGesture.OK:
                 chineseDescription = "确认";
+                play(chineseDescription);
                 break;
             default:
                 chineseDescription = "其他手势";
@@ -150,4 +175,19 @@ public class HandGestureGraphic extends GraphicOverlay.Graphic {
         }
         return new Rect((int) left, (int) top, (int) right, (int) bottom);
     }
+
+    public void play(String chineseDescription){
+        new Thread(new Runnable(){
+            @Override
+            public void run() {
+                TtsUtil.INSTANCE.playString(chineseDescription);
+            }
+        }).start();
+        try {
+            Thread.sleep(1000); //设置手势识别采样间隔（语音播报时间间隔）
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
