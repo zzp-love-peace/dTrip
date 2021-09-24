@@ -1,18 +1,16 @@
 package com.zzp.dtrip.activity
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Matrix
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Base64
-
 import android.util.Log
 import android.view.View
 import android.widget.CheckBox
@@ -20,22 +18,23 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.FileProvider
+import androidx.core.app.ActivityCompat
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputLayout
+import com.huawei.hms.mlsdk.livenessdetection.MLLivenessCapture
+import com.huawei.hms.mlsdk.livenessdetection.MLLivenessCaptureResult
+import com.lusfold.spinnerloading.SpinnerLoading
 import com.zzp.dtrip.R
 import com.zzp.dtrip.body.CmpFaceBody
 import com.zzp.dtrip.body.LoginBody
 import com.zzp.dtrip.data.LoginResult
 import com.zzp.dtrip.data.User
-import com.zzp.dtrip.util.AppService
-import com.zzp.dtrip.util.RetrofitManager
-import com.zzp.dtrip.util.UserInformation
+import com.zzp.dtrip.util.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.io.ByteArrayOutputStream
-import java.io.File
+import java.util.*
+import kotlin.concurrent.thread
 
 class LoginActivity : AppCompatActivity() {
 
@@ -46,20 +45,47 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var rememberPass: CheckBox
     private lateinit var prefs: SharedPreferences
     private lateinit var faceEntryButton: MaterialButton
-    private lateinit var progressBar: ProgressBar
+    private lateinit var spinnerLoading: SpinnerLoading
 
     private var username = ""
     private var password = ""
 
-    private var imageBase64: String = ""
-
-    private lateinit var imageUri: Uri
-
-    private lateinit var outputImage: File
-
-    private val CMP_FACE = 4
+    private var isPermissionRequested = false
+    private var bitmapCurrent: Bitmap? = null
 
     private val TAG = "LoginActivity"
+
+    private val liveFaceCallback: MLLivenessCapture.Callback = object : MLLivenessCapture.Callback {
+        override fun onSuccess(result: MLLivenessCaptureResult) {
+            //检测成功的处理逻辑，检测结果可能是活体或者非活体。
+            if (!result.isLive) {
+                showUserWrong("未检测出人脸", this@LoginActivity)
+                if (spinnerLoading.visibility == View.VISIBLE) {
+                    spinnerLoading.visibility = View.GONE
+                }
+                return
+            }
+            bitmapCurrent = result.bitmap
+            Log.e(
+                "TAG",
+                "拍照获取人脸照片" + bitmapCurrent?.width.toString() + "   " + bitmapCurrent?.height
+            )
+            if (bitmapCurrent == null) {
+                showUserWrong("failed to get picture!",this@LoginActivity)
+                if (spinnerLoading.visibility == View.VISIBLE) {
+                    spinnerLoading.visibility = View.GONE
+                }
+                return
+            }
+            compareFace(bitmapCurrent!!)
+
+        }
+
+        override fun onFailure(errorCode: Int) {
+            //检测未完成，如相机异常CAMERA_ERROR,添加失败的处理逻辑。
+            showUserWrong("检测失败 errorCode = $errorCode", this@LoginActivity)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,9 +107,20 @@ class LoginActivity : AppCompatActivity() {
         }
 
         faceEntryButton.setOnClickListener { //开启人脸登录活动
-            faceLogin()
-//            val intent = Intent(this, FaceLoginActivity::class.java)
-//            startActivity(intent)
+            // Checking Camera Permissions
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+            ) {
+                val capture = MLLivenessCapture.getInstance()
+                capture.startDetect(this, liveFaceCallback)
+                thread {
+                    Thread.sleep(1000)
+                    runOnUiThread {
+                        spinnerLoading.visibility = View.VISIBLE
+                    }
+                }
+            } else {
+                checkPermission()
+            }
         }
     }
 
@@ -94,7 +131,7 @@ class LoginActivity : AppCompatActivity() {
         entryButton = findViewById(R.id.entry_button)
         rememberPass = findViewById(R.id.remember_pass)
         faceEntryButton = findViewById(R.id.face_entry_button)
-        progressBar = findViewById(R.id.progress_bar)
+        spinnerLoading = findViewById(R.id.spinner_loading)
     }
 
     private fun initData() {
@@ -175,64 +212,6 @@ class LoginActivity : AppCompatActivity() {
         return flag
     }
 
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == CMP_FACE  && resultCode == Activity.RESULT_OK) {
-            progressBar.visibility = View.VISIBLE
-            var imageBitmap = BitmapFactory.decodeStream(contentResolver.
-                    openInputStream(imageUri))
-            val byteArrayOutputStream = ByteArrayOutputStream()
-            imageBitmap = compressImage(imageBitmap)
-            imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100,
-                byteArrayOutputStream)
-            byteArrayOutputStream.flush()
-            byteArrayOutputStream.close()
-
-            val imageByteArray = byteArrayOutputStream.toByteArray()
-            imageBase64 = Base64.encodeToString(imageByteArray, Base64.DEFAULT)
-//            Log.d(TAG+"i", imageBase64)
-            println(imageBase64)
-            compareFace()
-        }
-    }
-
-    private fun compressImage(image :Bitmap) : Bitmap{
-        val matrix = Matrix()
-        val w = image.width
-        val h = image.height
-        val true_width = 80.0f
-        val true_height = true_width * h / w
-        if (true_width >w) return image
-        val wsx = true_height/w
-        matrix.setScale(wsx,wsx)
-        return Bitmap.createBitmap(image,0,0,w,h,matrix,true)
-    }
-
-    private fun compareFace() {
-        val appService= RetrofitManager.create<AppService>()
-        Log.d(TAG, "compareFace: ${imageBase64.length}")
-        val task = appService.compareFace(CmpFaceBody(imageBase64))
-        task.enqueue(object : Callback<LoginResult>{
-            override fun onResponse(call: Call<LoginResult>, response: Response<LoginResult>) {
-                Log.d(TAG, "onResponse: ${response.code()}")
-                response.body()?.apply {
-                    if (this.errorCode == 0) {
-                        progressBar.visibility = View.GONE
-                        loginSuccess(this.user)
-                    }
-                    else {
-                        Toast.makeText(this@LoginActivity, errorMessage,
-                            Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-            override fun onFailure(call: Call<LoginResult>, t: Throwable) {
-                Log.d(TAG, "onFailure ==> $t")
-            }
-        })
-    }
-
 //    登录成功后对UserInformation的赋值
     private fun loginSuccess(user: User) {
         UserInformation.username = user.username
@@ -248,20 +227,44 @@ class LoginActivity : AppCompatActivity() {
         onBackPressed()
     }
 
-    private fun faceLogin() {
-        outputImage = File(externalCacheDir, "output_image.jpg")
-        if (outputImage.exists()) {
-            outputImage.delete()
+    private fun compareFace(image :Bitmap) {
+        val appService= RetrofitManager.create<AppService>()
+        val task = appService.compareFace(CmpFaceBody(bitmap2Base64(compressImage(image))))
+        task.enqueue(object : Callback<LoginResult> {
+            override fun onResponse(call: Call<LoginResult>, response: Response<LoginResult>) {
+                Log.d(TAG, "onResponse: ${response.code()}")
+                response.body()?.apply {
+                    if (this.errorCode == 0) {
+                        loginSuccess(this.user)
+                    }
+                    else {
+                        showUserWrong(errorMsg, this@LoginActivity)
+                        Log.d(TAG, "onResponse: --> $errorMsg")
+                    }
+                    spinnerLoading.visibility = View.GONE
+                }
+            }
+            override fun onFailure(call: Call<LoginResult>, t: Throwable) {
+                Log.d(TAG, "onFailure ==> $t")
+                if (spinnerLoading.visibility == View.VISIBLE) {
+                    spinnerLoading.visibility = View.GONE
+                }
+            }
+        })
+    }
+
+    private fun checkPermission() {
+        if (Build.VERSION.SDK_INT >= 23 && !isPermissionRequested) {
+            isPermissionRequested = true
+            val permissionsList = ArrayList<String>()
+            for (perm in LiveHandGestureAnalyseActivity.getAllPermission()) {
+                if (PackageManager.PERMISSION_GRANTED != checkSelfPermission(perm)) {
+                    permissionsList.add(perm)
+                }
+            }
+            if (permissionsList.isNotEmpty()) {
+                requestPermissions(permissionsList.toTypedArray(), 0)
+            }
         }
-        outputImage.createNewFile()
-        imageUri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            FileProvider.getUriForFile(this, "com.zzp.dtrip." +
-                    "fileprovider", outputImage)
-        } else {
-            Uri.fromFile(outputImage)
-        }
-        val intent = Intent("android.media.action.IMAGE_CAPTURE")
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
-        startActivityForResult(intent, CMP_FACE)
     }
 }

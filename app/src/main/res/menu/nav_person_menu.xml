@@ -20,33 +20,25 @@
     <group
         android:id="@+id/group3">
         <item
+            android:id="@+id/action_personal_delete"
+            android:icon="@drawable/ic_vector_delete"
+            android:title="删除人脸" />
+    </group>
+
+    <group
+        android:id="@+id/group4">
+        <item
             android:id="@+id/action_personal_data"
             android:icon="@drawable/ic_vector_data"
             android:title="出行数据" />
     </group>
 
     <group
-        android:id="@+id/group4">
-        <item
-            android:id="@+id/action_personal_password"
-            android:icon="@drawable/ic_vector_password"
-            android:title="修改密码" />
-    </group>
-
-    <group
         android:id="@+id/group5">
         <item
-            android:id="@+id/action_personal_home"
-            android:icon="@drawable/ic_vector_home"
-            android:title="居家模式" />
-    </group>
-
-    <group
-        android:id="@+id/group6">
-        <item
-            android:id="@+id/action_personal_about"
-            android:icon="@drawable/ic_vector_about"
-            android:title="关于我们" />
+            android:id="@+id/action_personal_setting"
+            android:icon="@drawable/ic_vector_settings"
+            android:title="设置" />
     </group>
 
 </menu>

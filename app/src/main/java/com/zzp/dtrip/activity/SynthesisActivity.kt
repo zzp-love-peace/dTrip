@@ -21,7 +21,11 @@ class SynthesisActivity : AppCompatActivity() {
 
         synthesisButton.setOnClickListener {
             if (synthesisEdit.text.toString().isNotEmpty()) {
-                TtsUtil.playString(synthesisEdit.text.toString())
+                if (synthesisEdit.text.toString().contains(Regex("[\u4E00-\u9FA5a-zA-Z0-9]"))) {
+                    TtsUtil.playString(synthesisEdit.text.toString().replace("\\p{P}", " "))
+                } else {
+                    Toast.makeText(this, "请输入您常用的话语哦!", Toast.LENGTH_SHORT).show()
+                }
             } else {
                 Toast.makeText(this, "您还没输入文字", Toast.LENGTH_SHORT).show()
             }

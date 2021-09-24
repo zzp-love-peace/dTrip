@@ -39,21 +39,12 @@
         android:id="@+id/nav_person_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:elevation="1dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/person_image"
         app:itemIconTint="#707070"
         app:menu="@menu/nav_person_menu" >
-
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/switch_material"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="72dp"
-            android:layout_marginRight="16dp"
-            app:switchMinWidth="60dp"
-            app:switchPadding="10dp"
-            android:layout_gravity="bottom|end"/>
 
     </com.google.android.material.navigation.NavigationView>
 
@@ -75,7 +66,6 @@
         app:layout_constraintVertical_bias="0.35"
         app:strokeColor="@color/blue"
         app:strokeWidth="3dp" />
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

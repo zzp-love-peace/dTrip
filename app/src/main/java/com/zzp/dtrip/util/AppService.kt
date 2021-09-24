@@ -4,10 +4,7 @@ import com.zzp.dtrip.body.*
 import com.zzp.dtrip.data.FaceResult
 import com.zzp.dtrip.data.LoginResult
 import com.zzp.dtrip.data.NormalResult
-import com.zzp.dtrip.javabean.compareFaceAsk
-import com.zzp.dtrip.javabean.compareFaceResponse
 import retrofit2.Call
-import retrofit2.Callback
 import retrofit2.http.*
 
 interface AppService {
@@ -34,4 +31,7 @@ interface AppService {
 
     @POST("/face/compareFace")
     fun compareFace(@Body cmpFaceBody: CmpFaceBody) : Call<LoginResult>
+
+    @POST("/face/deleteFace")
+    fun deleteFace(@Body deleteFaceBody: DeleteFaceBody) : Call<NormalResult>
 }

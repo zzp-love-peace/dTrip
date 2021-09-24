@@ -5,19 +5,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal">
-<com.zzp.dtrip.view.LensEnginePreview
 
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/hand_preview"
-    />
+    <com.zzp.dtrip.view.LensEnginePreview
+
+        android:id="@+id/hand_preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 
     <com.zzp.dtrip.view.GraphicOverlay
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
         android:id="@+id/hand_overlay"
-        />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 
     <Button

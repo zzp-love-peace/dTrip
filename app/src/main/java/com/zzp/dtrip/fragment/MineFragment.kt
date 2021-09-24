@@ -1,5 +1,6 @@
 package com.zzp.dtrip.fragment
 
+import android.Manifest
 import android.app.Activity
 import android.content.*
 import android.content.pm.PackageManager
@@ -9,6 +10,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.media.ExifInterface
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Base64
@@ -18,16 +20,21 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.switchmaterial.SwitchMaterial
+import com.huawei.hms.mlsdk.livenessdetection.MLLivenessCapture
+import com.huawei.hms.mlsdk.livenessdetection.MLLivenessCaptureResult
 import com.zzp.dtrip.R
 import com.zzp.dtrip.activity.*
+import com.zzp.dtrip.body.DeleteFaceBody
 import com.zzp.dtrip.body.FaceBody
 import com.zzp.dtrip.data.FaceResult
+import com.zzp.dtrip.util.*
+import com.zzp.dtrip.data.NormalResult
 import com.zzp.dtrip.util.AppService
 import com.zzp.dtrip.util.RetrofitManager
 import com.zzp.dtrip.util.UserInformation
@@ -35,18 +42,14 @@ import de.hdodenhof.circleimageview.CircleImageView
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.io.ByteArrayOutputStream
 import java.io.File
+import java.util.ArrayList
 
 class MineFragment : Fragment() {
 
     private lateinit var navPersonView: NavigationView
 
-    private lateinit var switchMaterial: SwitchMaterial
-
     private lateinit var controlButton: MaterialButton
-
-    private lateinit var prefs: SharedPreferences
 
     private lateinit var usernameText: TextView
     private lateinit var headImageView: CircleImageView
@@ -57,23 +60,47 @@ class MineFragment : Fragment() {
 
     private var imageUri: Uri? = null
 
-    private var imageBase64: String = ""
+    private var bitmapCurrent: Bitmap? = null
 
     private var flag = -1
 
     private val TAG = "MineFragment"
 
-    private val ADD_DATA = 3
+    private var isPermissionRequested = false
 
     companion object {
         var switchFlag = false
+    }
+
+    private val liveFaceCallback: MLLivenessCapture.Callback = object : MLLivenessCapture.Callback {
+        override fun onSuccess(result: MLLivenessCaptureResult) {
+            //检测成功的处理逻辑，检测结果可能是活体或者非活体。
+            if (!result.isLive) {
+                showUserWrong("未检测出人脸", requireContext())
+                return
+            }
+            bitmapCurrent = result.bitmap
+            Log.e(
+                "TAG",
+                "拍照获取人脸照片" + bitmapCurrent?.width.toString() + "   " + bitmapCurrent?.height
+            )
+            if (bitmapCurrent == null) {
+                showUserWrong("failed to get picture!",requireContext())
+                return
+            }
+            postFaceData(bitmapCurrent!!)
+        }
+
+        override fun onFailure(errorCode: Int) {
+            //检测未完成，如相机异常CAMERA_ERROR,添加失败的处理逻辑。
+            showUserWrong("检测失败 errorCode = $errorCode", requireContext())
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?): View {
         val root: View = inflater.inflate(R.layout.fragment_mine, container, false)
         findViewById(root)
-        initPrefAndSwitch()
         doRegisterReceiver()
         initData()
         pref = requireContext().getSharedPreferences("data", Context.MODE_PRIVATE)
@@ -92,8 +119,22 @@ class MineFragment : Fragment() {
                 }
                 R.id.action_personal_face -> {
                     if (UserInformation.isLogin) {
-                        val intent = Intent("android.media.action.IMAGE_CAPTURE")
-                        startActivityForResult(intent, ADD_DATA)
+                        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+                        ) {
+                            val capture = MLLivenessCapture.getInstance()
+                            capture.startDetect(requireActivity(), liveFaceCallback)
+                        } else {
+                            checkPermission()
+                        }
+                    }
+                    else {
+                        val intent = Intent(requireContext(), LoginActivity::class.java)
+                        startActivity(intent)
+                    }
+                }
+                R.id.action_personal_delete -> {
+                    if (UserInformation.isLogin) {
+                        deleteFaceData()
                     }
                     else {
                         val intent = Intent(requireContext(), LoginActivity::class.java)
@@ -110,20 +151,8 @@ class MineFragment : Fragment() {
                         startActivity(intent)
                     }
                 }
-                R.id.action_personal_password -> {
-                    if (UserInformation.isLogin) {
-                        val intent = Intent(requireContext(), ReplaceActivity::class.java)
-                        startActivity(intent)
-                    }
-                    else {
-                        val intent = Intent(requireContext(), LoginActivity::class.java)
-                        startActivity(intent)
-                    }
-                }
-                R.id.action_personal_home -> {
-                }
-                R.id.action_personal_about -> {
-                    val intent = Intent(requireContext(), AboutActivity::class.java)
+                R.id.action_personal_setting -> {
+                    val intent = Intent(requireContext(), SettingsActivity::class.java)
                     startActivity(intent)
                 }
             }
@@ -146,32 +175,14 @@ class MineFragment : Fragment() {
             }
         }
 
-        switchMaterial.setOnCheckedChangeListener { buttonView, isChecked ->
-            switchFlag = isChecked
-            saveSwitchFlag()
-        }
         return root
     }
 
     private fun findViewById(root: View) {
         navPersonView = root.findViewById(R.id.nav_person_view)
-        switchMaterial = root.findViewById(R.id.switch_material)
         controlButton = root.findViewById(R.id.control_button)
         usernameText = root.findViewById(R.id.username_text)
         headImageView = root.findViewById(R.id.head_image)
-    }
-
-    private fun initPrefAndSwitch() {
-        prefs = requireActivity().getPreferences(Context.MODE_PRIVATE)
-        switchFlag = prefs.getBoolean("switch", false)
-        switchMaterial.isChecked = switchFlag
-        Log.d(TAG, "initPrefAndSwitch: ")
-    }
-
-    private fun saveSwitchFlag() {
-        val edit = prefs.edit()
-        edit.putBoolean("switch", switchFlag)
-        edit.apply()
     }
 
     private fun doRegisterReceiver() {
@@ -261,56 +272,17 @@ class MineFragment : Fragment() {
         return rotatedBitmap
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        when (requestCode) {
-            1 -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    faceRecognition()
-                } else {
-                    Toast.makeText(requireContext(), "您需要开启权限",
-                        Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-    }
-
-    private fun faceRecognition() {
-        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        startActivityForResult(intent, ADD_DATA)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == ADD_DATA  && resultCode == Activity.RESULT_OK) {
-            var imageBitmap = data?.extras?.get("data") as Bitmap
-            imageBitmap = compressImage(imageBitmap)
-            val byteArrayOutputStream = ByteArrayOutputStream()
-            byteArrayOutputStream.use {
-                imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
-                val imageByteArray = it.toByteArray()
-                imageBase64 = Base64.encodeToString(imageByteArray, Base64.DEFAULT)
-                Log.d(TAG, imageBase64)
-            }
-            postFaceData()
-        }
-    }
-
-    private fun postFaceData() {
+    private fun postFaceData(image: Bitmap) {
         val appService = RetrofitManager.create<AppService>()
-        val task = appService.postFaceData(FaceBody(imageBase64, UserInformation.ID))
+        val task = appService.postFaceData(FaceBody(bitmap2Base64(compressImage(image)), UserInformation.ID))
         task.enqueue(object : Callback<FaceResult> {
             override fun onResponse(call: Call<FaceResult>,
                 response: Response<FaceResult>) {
                 Log.d(TAG, "onResponse: ${response.code()}")
                 response.body()?.apply {
                     if (isError) {
-                        Snackbar.make(requireView(), errorMessage, Snackbar.LENGTH_SHORT).show()
-//                        Toast.makeText(requireContext()
-//                            , errorMsg, Toast.LENGTH_SHORT).show()
-                        Log.d(TAG, "onResponse: $errorMessage")
+                        Snackbar.make(requireView(), errorMsg, Snackbar.LENGTH_SHORT).show()
+                        Log.d(TAG, "onResponse: $errorMsg")
                         
                     } else {
                         Toast.makeText(requireContext()
@@ -329,15 +301,41 @@ class MineFragment : Fragment() {
         })
     }
 
-    private fun compressImage(image :Bitmap) : Bitmap{
-        val matrix = Matrix()
-        val w = image.width
-        val h = image.height
-        val true_width = 540.0f
-        val true_height = true_width * h / w
-        if (true_width >w) return image
-        val wsx = true_height/w
-        matrix.setScale(wsx,wsx)
-        return Bitmap.createBitmap(image,0,0,w,h,matrix,true)
+    private fun checkPermission() {
+        if (Build.VERSION.SDK_INT >= 23 && !isPermissionRequested) {
+            isPermissionRequested = true
+            val permissionsList = ArrayList<String>()
+            for (perm in LiveHandGestureAnalyseActivity.getAllPermission()) {
+                if (PackageManager.PERMISSION_GRANTED != requireContext().checkSelfPermission(perm)) {
+                    permissionsList.add(perm)
+                }
+            }
+            if (permissionsList.isNotEmpty()) {
+                requestPermissions(permissionsList.toTypedArray(), 0)
+            }
+        }
+    }
+
+    private fun deleteFaceData() {
+        val appService = RetrofitManager.create<AppService>()
+        val task = appService.deleteFace(DeleteFaceBody(UserInformation.ID))
+        task.enqueue(object : Callback<NormalResult> {
+            override fun onResponse(call: Call<NormalResult>, response: Response<NormalResult>) {
+                response.body()?.apply {
+                    Log.d(TAG, "onResponse: ${response.code()} $errorCode")
+                    if (isError) {
+                        Toast.makeText(requireContext(), "无人脸数据,删除人脸失败!", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(requireContext(), "删除人脸成功!", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<NormalResult>, t: Throwable) {
+                Log.d(TAG, "onFailure ==> $t")
+                Toast.makeText(requireContext(), t.toString(), Toast.LENGTH_SHORT).show()
+            }
+
+        })
     }
 }
