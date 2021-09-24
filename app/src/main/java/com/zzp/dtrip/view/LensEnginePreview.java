@@ -93,6 +93,7 @@ public class LensEnginePreview extends ViewGroup {
         }
     }
 
+
     private class SurfaceCallback implements SurfaceHolder.Callback {
         @Override
         public void surfaceCreated(SurfaceHolder surface) {
@@ -113,6 +114,7 @@ public class LensEnginePreview extends ViewGroup {
         public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         }
     }
+
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
@@ -183,4 +185,6 @@ public class LensEnginePreview extends ViewGroup {
         Log.d(LensEnginePreview.TAG, "isPortraitMode returning false by default");
         return false;
     }
+
+
 }
